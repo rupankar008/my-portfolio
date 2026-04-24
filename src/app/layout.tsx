@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
+import Navbar from "@/components/Navbar";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Creative Developer | Portfolio",
-  description: "A high-end Scrollytelling Personal Portfolio Website.",
+  title: "Rupankar | Creative Developer",
+  description: "Portfolio of Rupankar Bhuiya - Interactive Designer & Developer",
 };
 
 export default function RootLayout({
@@ -19,10 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased`} suppressHydrationWarning>
-        <CustomCursor />
-        {children}
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-[#050505] text-white antialiased selection:bg-blue-500/30`}>
+        <SmoothScroll>
+          <CustomCursor />
+          <Navbar />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

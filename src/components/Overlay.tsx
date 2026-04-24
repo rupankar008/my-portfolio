@@ -1,87 +1,81 @@
 "use client";
 
-import { motion, MotionValue, useTransform } from "framer-motion";
-import { Mail, ArrowRight, User } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { User, Mail } from "lucide-react";
 
-interface OverlayProps {
-  progress: MotionValue<number>;
-}
-
-export default function Overlay({ progress }: OverlayProps) {
-  // Section 1: 0% to 20%
-  const opacity1 = useTransform(progress, [0, 0.1, 0.2, 1], [1, 1, 0, 0]);
-  const y1 = useTransform(progress, [0, 0.2, 1], [0, -50, -50]);
-
-  // Section 2: 30% to 50%
-  const opacity2 = useTransform(progress, [0, 0.2, 0.3, 0.4, 0.5, 1], [0, 0, 1, 1, 0, 0]);
-  const y2 = useTransform(progress, [0, 0.2, 0.5, 1], [50, 50, -50, -50]);
-
-  // Section 3: 60% to 80%
-  const opacity3 = useTransform(progress, [0, 0.5, 0.6, 0.7, 0.8, 1], [0, 0, 1, 1, 0, 0]);
-  const y3 = useTransform(progress, [0, 0.5, 0.8, 1], [50, 50, -50, -50]);
-
+export default function Overlay() {
   return (
-    <div className="absolute inset-0 pointer-events-none z-10 flex flex-col justify-center max-w-7xl mx-auto px-6 md:px-12 w-full h-full">
-      {/* Section 1: Intro */}
-      <motion.div
-        style={{ opacity: opacity1, y: y1 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center w-full"
-      >
-        <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4 drop-shadow-2xl">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-            Rupankar Bhuiya
-          </span>
-        </h1>
-        <p className="text-2xl md:text-4xl text-white/90 font-light tracking-wide drop-shadow-md">
-          Creative Developer.
-        </p>
-      </motion.div>
-
-      {/* Section 2: Bio */}
-      <motion.div
-        style={{ opacity: opacity2, y: y2 }}
-        className="absolute top-1/2 left-6 md:left-12 -translate-y-1/2 max-w-2xl pointer-events-auto"
-      >
-        <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-none drop-shadow-xl">
-          I build <br className="hidden md:block" /> digital experiences.
-        </h2>
-        <p className="text-xl md:text-2xl text-white/80 font-light leading-relaxed mb-8 drop-shadow-md">
-          Crafting immersive, high-performance interfaces that bridge the gap between complex engineering and beautiful design. I specialize in React, Next.js, and WebGL animations.
-        </p>
-        <div className="flex flex-wrap gap-4 relative z-[100] pointer-events-auto">
+    <div className="relative z-10 w-full">
+      {/* SECTION 1: HERO */}
+      <section className="min-h-screen flex flex-col justify-center px-6 md:px-20 py-20 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="max-w-4xl"
+        >
+          <h2 className="text-blue-400 font-bold uppercase tracking-[0.5em] text-xs mb-6 block">The Digital Visionary</h2>
+          <h1 className="text-6xl md:text-9xl font-black tracking-tighter mb-8 leading-[0.85]">
+            RUPANKAR <br /> 
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+              BHUIYA
+            </span>
+          </h1>
+          <p className="text-lg md:text-2xl text-white/50 font-light max-w-2xl mb-12 leading-relaxed">
+            Architecting high-performance, interactive digital experiences that bridge the gap between design and pure code.
+          </p>
+          
+          <div className="flex flex-wrap gap-6 relative z-[100] pointer-events-auto">
             <Link 
               href="/about" 
-              className="inline-block px-10 py-5 bg-white text-black rounded-full font-bold text-lg hover:scale-105 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.5)]"
+              className="group relative px-10 py-5 bg-white text-black rounded-full font-bold text-lg overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.3)]"
             >
-              About Me
+              <span className="relative z-10">ABOUT ME</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
           </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Section 3: Contact */}
-      <motion.div
-        style={{ opacity: opacity3, y: y3 }}
-        className="absolute top-1/2 right-6 md:right-12 -translate-y-1/2 text-right max-w-xl pointer-events-auto"
-      >
-        <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-none drop-shadow-xl">
-          Let's create <br className="hidden md:block"/> something epic.
-        </h2>
-        <p className="text-xl md:text-2xl text-white/80 font-light leading-relaxed mb-10 drop-shadow-md">
-          Transforming abstract concepts into functional, interactive realities through code.
-        </p>
-        
-        <div className="flex justify-end pointer-events-auto">
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vmtolegit@gmail.com" target="_blank" rel="noreferrer" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-8 py-4 font-medium text-slate-900 shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300 hover:scale-105 active:scale-95">
-            <span className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 transition-opacity duration-300 group-hover:opacity-20"></span>
-            <span className="relative flex items-center gap-3 font-bold text-lg">
-              <Mail size={20} />
-              Email Me
-              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-            </span>
-          </a>
-        </div>
-      </motion.div>
+        {/* Section Divider Glow */}
+        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent blur-[1px]" />
+      </section>
+
+      {/* SECTION 2: EXPERIENCE / VISION */}
+      <section className="min-h-screen flex flex-col justify-center px-6 md:px-20 py-20 bg-gradient-to-b from-transparent to-blue-900/5 relative">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="max-w-4xl ml-auto text-right"
+        >
+          <h2 className="text-purple-400 font-bold uppercase tracking-[0.5em] text-xs mb-6">Expertise & Vision</h2>
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
+            PUSHING THE <br />
+            <span className="text-transparent border-b-2 border-white/20">POSSIBILITIES.</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed mb-12 max-w-2xl ml-auto">
+            I don't just build websites. I build digital worlds where every pixel tells a story and every interaction creates a memory.
+          </p>
+          
+          <div className="flex justify-end relative z-[100] pointer-events-auto">
+            <a 
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=vmtolegit@gmail.com" 
+              target="_blank" 
+              rel="noreferrer" 
+              className="group relative flex items-center gap-4 bg-white/5 border border-white/10 px-10 py-5 rounded-full font-bold text-white backdrop-blur-xl transition-all hover:bg-white/10 hover:border-white/30 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.05)]"
+            >
+              <Mail className="text-blue-400 group-hover:rotate-12 transition-transform" />
+              <span>EMAIL ME</span>
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Section Divider Glow */}
+        <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent blur-[1px]" />
+      </section>
     </div>
   );
 }

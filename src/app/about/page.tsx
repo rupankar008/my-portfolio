@@ -1,132 +1,133 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { MapPin, GraduationCap, Code2, ArrowLeft } from "lucide-react";
-import { InstagramIcon } from "@/components/Icons";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { User, Code, Briefcase, Zap, Github, Instagram, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
+import { useRef } from "react";
+
+function TiltCard({ children, className }: { children: React.ReactNode, className?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = (y - centerY) / 10;
+    const rotateY = (centerX - x) / 10;
+
+    cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+  };
+
+  return (
+    <div 
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`transition-transform duration-200 ease-out ${className}`}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function AboutPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+
   return (
-    <main className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
-      <Navbar />
-      
-      {/* Ambient glowing background effects */}
-      <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-[150px] pointer-events-none" />
-      
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
+    <main ref={containerRef} className="relative min-h-screen bg-[#050505] overflow-hidden selection:bg-purple-500/30">
+      {/* Dynamic Background */}
+      <motion.div 
+        style={{ y: backgroundY }}
+        className="absolute inset-0 z-0"
+      >
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]" />
+      </motion.div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-40">
-        
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-16"
-        >
-          <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors uppercase tracking-widest text-sm font-bold">
-            <ArrowLeft size={16} />
-            Back to Portfolio
-          </Link>
-        </motion.div>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-32">
+        <Link href="/" className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-12 group">
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Home</span>
+        </Link>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <h1 className="text-7xl md:text-9xl font-black tracking-tighter mb-8 drop-shadow-2xl">
-            Behind the <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              Code.
-            </span>
-          </h1>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mt-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="md:col-span-7"
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          {/* Left Side: Intro */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl font-bold mb-6 text-white/90">I'm Rupankar Bhuiya.</h2>
-            <div className="space-y-6 text-xl md:text-2xl font-light text-white/70 leading-relaxed">
-              <p>
-                I am a passionate <strong className="text-white font-medium">Creative Developer</strong> who loves everything about code. I believe that engineering and design are not two separate disciplines, but rather two sides of the same coin used to create magical digital experiences.
-              </p>
-              <p>
-                My journey into programming started with an insatiable curiosity for how things work on the internet. Since then, I've dedicated myself to mastering the art of front-end development, specifically focusing on micro-interactions, WebGL, and ultra-smooth animations that make users go "wow".
-              </p>
-              <p>
-                I don't just write code; I craft digital architecture. Every component, every animation curve, and every gradient is meticulously designed to push the boundaries of what is possible on the web today.
-              </p>
+            <h1 className="text-7xl font-black tracking-tighter mb-8">
+              ABOUT <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+                MYSELF
+              </span>
+            </h1>
+            <p className="text-xl text-white/60 font-light leading-relaxed mb-10">
+              I am a creative developer who believes that the web should be an experience, not just a tool. 
+              My journey started with a fascination for interactive art, which evolved into a professional 
+              career building high-performance digital products.
+            </p>
+
+            <div className="grid grid-cols-2 gap-6">
+              <TiltCard className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+                <Zap className="text-blue-400 mb-4" size={32} />
+                <h3 className="font-bold text-lg mb-1 text-white">Performance</h3>
+                <p className="text-sm text-white/40">Optimized, fast, and lightweight code.</p>
+              </TiltCard>
+              <TiltCard className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
+                <Code className="text-purple-400 mb-4" size={32} />
+                <h3 className="font-bold text-lg mb-1 text-white">Interactive</h3>
+                <p className="text-sm text-white/40">Immersive animations and transitions.</p>
+              </TiltCard>
             </div>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="md:col-span-5 space-y-6"
+          {/* Right Side: Skill Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="space-y-6"
           >
-            {/* Stats/Info Cards */}
-            <div className="glass rounded-3xl p-8 hover:bg-white/5 transition-colors border border-white/10 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Code2 className="text-blue-400 mb-4" size={32} />
-              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-widest">Discipline</h3>
-              <p className="text-white/60">Creative Engineering & UI/UX Design</p>
+            <div className="p-10 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-transparent border border-white/10 backdrop-blur-3xl relative overflow-hidden group">
+               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <User size={120} />
+               </div>
+               <h2 className="text-3xl font-bold mb-6">Expertise</h2>
+               <div className="space-y-4">
+                  {["Next.js / React", "Framer Motion", "Three.js / WebGL", "UI/UX Design", "TypeScript"].map((skill) => (
+                    <div key={skill} className="flex items-center gap-3">
+                       <div className="w-2 h-2 rounded-full bg-blue-500" />
+                       <span className="text-white/80 font-medium">{skill}</span>
+                    </div>
+                  ))}
+               </div>
             </div>
 
-            <div className="glass rounded-3xl p-8 hover:bg-white/5 transition-colors border border-white/10 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <GraduationCap className="text-purple-400 mb-4" size={32} />
-              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-widest">Education</h3>
-              <p className="text-white/60">ISC 12th Pass Out</p>
-            </div>
-
-            <div className="glass rounded-3xl p-8 hover:bg-white/5 transition-colors border border-white/10 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <MapPin className="text-pink-400 mb-4" size={32} />
-              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-widest">Location</h3>
-              <p className="text-white/60">Burdwan, West Bengal</p>
+            <div className="p-10 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-2xl">
+               <h2 className="text-3xl font-bold mb-6">Vision</h2>
+               <p className="text-white/60 leading-relaxed italic">
+                 "I don't just build websites. I build digital worlds where every pixel tells a story and every interaction creates a memory."
+               </p>
             </div>
           </motion.div>
         </div>
-
-        {/* Connect Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mt-40 text-center relative"
-        >
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-gradient-to-tr from-purple-500/20 to-pink-500/20 rounded-full blur-[80px] pointer-events-none" />
-          
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8 relative z-10">
-            Let's build the future.
-          </h2>
-          
-          <a 
-            href="https://instagram.com/rupankar.void"
-            target="_blank"
-            rel="noreferrer"
-            className="group relative z-10 inline-flex items-center gap-4 bg-white px-10 py-5 rounded-full text-black hover:scale-105 transition-transform duration-300 shadow-[0_0_40px_rgba(255,255,255,0.2)] active:scale-95"
-          >
-            <div className="bg-gradient-to-tr from-purple-500 to-pink-500 p-2 rounded-full text-white">
-              <InstagramIcon size={24} />
-            </div>
-            <span className="text-xl font-bold tracking-wide">@rupankar.void</span>
-          </a>
-        </motion.div>
-
       </div>
     </main>
   );
