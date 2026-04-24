@@ -1,73 +1,73 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
+  const mouse = {
+    x: useSpring(0, { damping: 20, stiffness: 250, mass: 0.5 }),
+    y: useSpring(0, { damping: 20, stiffness: 250, mass: 0.5 }),
+  };
+
+  const ringSize = isHovering ? 60 : 30;
+
   useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || ('ontouchstart' in window));
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth >= 768) {
+        mouse.x.set(e.clientX);
+        mouse.y.set(e.clientY);
+      }
     };
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Check if hovering over interactive elements
-      if (
-        target.tagName.toLowerCase() === "a" ||
-        target.tagName.toLowerCase() === "button" ||
-        target.closest("a") ||
-        target.closest("button")
-      ) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
+      setIsHovering(
+        target.tagName === "BUTTON" ||
+        target.tagName === "A" ||
+        target.closest("button") !== null ||
+        target.closest("a") !== null
+      );
     };
 
-    window.addEventListener("mousemove", updateMousePosition);
+    window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
+      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseover", handleMouseOver);
     };
   }, []);
 
+  // Return nothing if on mobile or touch device
+  if (isMobile) return null;
+
   return (
-    <>
-      {/* Outer Glow Ring */}
+    <div className="fixed inset-0 pointer-events-none z-[9999] hidden md:block">
+      {/* Outer Ring */}
       <motion.div
-        className="fixed top-0 left-0 w-10 h-10 border-2 border-white/50 rounded-full pointer-events-none z-[100] mix-blend-difference"
-        animate={{
-          x: mousePosition.x - 20,
-          y: mousePosition.y - 20,
-          scale: isHovering ? 1.5 : 1,
-          backgroundColor: isHovering ? "rgba(255,255,255,1)" : "rgba(255,255,255,0)",
+        style={{
+          x: mouse.x,
+          y: mouse.y,
+          translateX: "-50%",
+          translateY: "-50%",
+          width: ringSize,
+          height: ringSize,
         }}
-        transition={{
-          type: "spring",
-          stiffness: 300,
-          damping: 20,
-          mass: 0.5,
-        }}
-      />
-      {/* Inner Dot */}
-      <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference"
-        animate={{
-          x: mousePosition.x - 4,
-          y: mousePosition.y - 4,
-          opacity: isHovering ? 0 : 1,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 1000,
-          damping: 40,
-        }}
-      />
-    </>
+        className="border border-white/50 rounded-full flex items-center justify-center transition-[width,height] duration-300"
+      >
+        {/* Inner Dot */}
+        <div className="w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+      </motion.div>
+    </div>
   );
 }
