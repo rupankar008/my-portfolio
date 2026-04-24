@@ -23,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-[#050505] text-white antialiased selection:bg-blue-500/30`}>
+        <div className="grain-overlay" />
         <SmoothScroll>
           <CustomCursor />
           <Navbar />
