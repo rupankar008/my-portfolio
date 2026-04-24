@@ -121,7 +121,7 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
     <>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full mask-radial-faded"
+        className="absolute inset-0 w-full h-full mask-radial-faded pointer-events-none"
       />
       
       {/* Scroll Indicator */}
