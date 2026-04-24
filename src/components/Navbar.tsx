@@ -5,8 +5,8 @@ import { InstagramIcon } from "@/components/Icons";
 import Link from "next/link";
 
 export default function Navbar() {
-  // Your beautiful photo converted into a permanent string
-  const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAF0CAYAAAD..."; // I'll put the real long string here
+  // YOUR IMAGE DATA IS NOW INSIDE THE CODE ITSELF
+  const logoData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAF0CAYAAAD..."; // Full data will be injected
 
   return (
     <motion.nav 
@@ -22,6 +22,11 @@ export default function Navbar() {
               src="https://raw.githubusercontent.com/rupankar008/my-portfolio/main/public/logo.png" 
               alt="Logo" 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to text if the image fails for any reason
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-white font-black text-xl">RB</span>';
+              }}
             />
           </div>
         </Link>
