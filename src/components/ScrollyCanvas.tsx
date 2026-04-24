@@ -27,14 +27,11 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
   useEffect(() => {
     const images: HTMLImageElement[] = [];
     let essentialLoaded = 0;
-    
-    // We only wait for these "essential" frames to show the site (every 5th frame)
     const essentialIndices = [0, 24, 48, 72, 96, 119]; 
 
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
       img.src = getFrameUrl(i);
-      
       img.onload = () => {
         if (essentialIndices.includes(i)) {
           essentialLoaded++;
@@ -54,10 +51,8 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    // Use the requested image, but if not loaded, find the closest loaded one
     let img = imagesRef.current[index];
     if (!img || !img.complete) {
-      // Find the nearest loaded frame so the screen never goes blank
       for (let offset = 1; offset < 20; offset++) {
         const prev = imagesRef.current[index - offset];
         if (prev && prev.complete) { img = prev; break; }
@@ -68,33 +63,20 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
     if (!img || !img.complete) return;
 
+    // ORIGINAL CINEMATIC "COVER" LOGIC
     const canvasRatio = canvas.width / canvas.height;
     const imgRatio = img.width / img.height;
     let renderWidth = canvas.width, renderHeight = canvas.height, x = 0, y = 0;
 
-    if (window.innerWidth < 768) {
-      if (canvasRatio > imgRatio) {
-        renderHeight = canvas.height;
-        renderWidth = canvas.height * imgRatio;
-        x = (canvas.width - renderWidth) / 2;
-      } else {
-        renderWidth = canvas.width;
-        renderHeight = canvas.width / imgRatio;
-        y = (canvas.height - renderHeight) / 2;
-      }
+    if (canvasRatio > imgRatio) {
+      renderHeight = canvas.width / imgRatio;
+      y = (canvas.height - renderHeight) / 2;
     } else {
-      if (canvasRatio > imgRatio) {
-        renderHeight = canvas.width / imgRatio;
-        y = (canvas.height - renderHeight) / 2;
-      } else {
-        renderWidth = canvas.height * imgRatio;
-        x = (canvas.width - renderWidth) / 2;
-      }
+      renderWidth = canvas.height * imgRatio;
+      x = (canvas.width - renderWidth) / 2;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#050505";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, x, y, renderWidth, renderHeight);
   };
 
@@ -118,7 +100,7 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
   return (
     <>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none object-cover" />
       
       {ready && (
         <motion.div 
