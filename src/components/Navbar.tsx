@@ -13,22 +13,25 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 glass-nav px-6 py-4"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* CUSTOM ILLUSTRATED SVG LOGO */}
         <Link href="/" className="group relative flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95 bg-black">
-            <img 
-              src="https://r.jina.ai/i/0582803b9b47432fb778556810a905bc" 
-              alt="Logo" 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = '<span class="text-white font-black text-xl">RB</span>';
-                  parent.className = "w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-pink-600 shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all duration-300 group-hover:scale-110";
-                }
-              }}
-            />
+          <div className="relative w-12 h-12 flex items-center justify-center rounded-full overflow-hidden transition-all duration-500 group-hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(37,99,235,0.3)]">
+             <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 via-purple-600 to-pink-600 animate-spin-slow opacity-80" />
+             <div className="absolute inset-[2px] bg-[#050505] rounded-full z-10" />
+             
+             <svg viewBox="0 0 100 100" className="w-8 h-8 z-20 relative">
+                <defs>
+                   <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#60A5FA" />
+                      <stop offset="100%" stopColor="#F472B6" />
+                   </linearGradient>
+                </defs>
+                <path 
+                   d="M30 25 L70 25 L70 45 L45 45 L70 75 L45 75 L30 50 L30 75 L30 25 Z" 
+                   fill="url(#logo-grad)" 
+                   className="drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]"
+                />
+             </svg>
           </div>
         </Link>
         
