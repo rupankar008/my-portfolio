@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* Global Reset & Base Styles */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #050505; /* Deep dark premium background */
+  color: #ffffff; 
+  font-family: var(--font-sans);
+  overscroll-behavior: none;
+  cursor: none;
+}
+
+/* Ensure links and buttons don't show the default pointer either */
+a, button, [role="button"], input, select, textarea {
+  cursor: none !important;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide Scrollbar for a cleaner cinematic look */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glassmorphism utilities */
+@layer utilities {
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  }
+  
+  .glass-nav {
+    background: rgba(5, 5, 5, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* CSS Masking for Canvas Feathering */
+  .mask-radial-faded {
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+}
