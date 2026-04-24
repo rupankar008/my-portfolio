@@ -46,7 +46,7 @@ export default function Projects() {
           className="mb-16"
         >
           <h2 className="text-sm uppercase tracking-[0.5em] text-white/40 font-bold mb-4">Selected Work</h2>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter italic">CRAFTED WITH <br/> <span className="text-blue-500">PRECISION.</span></h2>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter italic uppercase">Crafted with <br/> <span className="text-blue-500">Precision.</span></h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">

@@ -10,7 +10,6 @@ export default function Overlay() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
 
-  // Kinetic Typography: Titles slightly "skew" or "shift" on scroll
   const titleSkew = useTransform(scrollYProgress, [0, 0.2], [0, -5]);
   const titleX = useTransform(scrollYProgress, [0, 0.2], [0, -20]);
 
@@ -71,7 +70,7 @@ export default function Overlay() {
           <h2 className="text-purple-400 font-bold uppercase tracking-[0.5em] text-xs mb-8">Creative Philosophy</h2>
           <h2 className="text-5xl md:text-8xl font-black tracking-tight mb-10 leading-[0.9]">
             BEYOND THE <br />
-            <span className="text-transparent stroke-text" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.3)" }}>
+            <span className="text-transparent" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.3)" }}>
               ORDINARY.
             </span>
           </h2>
