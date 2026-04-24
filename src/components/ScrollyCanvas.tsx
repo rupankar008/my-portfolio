@@ -20,33 +20,31 @@ interface ScrollyCanvasProps {
 export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  const [firstFrameLoaded, setFirstFrameLoaded] = useState(false);
-  const [allLoaded, setAllLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const indicatorOpacity = useTransform(progress, [0, 0.05], [1, 0]);
 
   useEffect(() => {
-    let loadedCount = 0;
     const images: HTMLImageElement[] = [];
-
-    // Load first frame ASAP
-    const firstImg = new Image();
-    firstImg.src = getFrameUrl(0);
-    firstImg.onload = () => {
-      setFirstFrameLoaded(true);
-      drawImage(0);
-    };
+    let essentialLoaded = 0;
     
-    // Load the rest
+    // We only wait for these "essential" frames to show the site (every 5th frame)
+    const essentialIndices = [0, 24, 48, 72, 96, 119]; 
+
     for (let i = 0; i < FRAME_COUNT; i++) {
-      const img = i === 0 ? firstImg : new Image();
-      if (i !== 0) img.src = getFrameUrl(i);
+      const img = new Image();
+      img.src = getFrameUrl(i);
       
       img.onload = () => {
-        loadedCount++;
-        if (loadedCount === FRAME_COUNT) setAllLoaded(true);
+        if (essentialIndices.includes(i)) {
+          essentialLoaded++;
+          if (essentialLoaded === essentialIndices.length) {
+            setReady(true);
+            drawImage(0);
+          }
+        }
       };
-      images.push(img);
+      images[i] = img;
     }
     imagesRef.current = images;
   }, []);
@@ -56,22 +54,25 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    const img = imagesRef.current[index];
+    // Use the requested image, but if not loaded, find the closest loaded one
+    let img = imagesRef.current[index];
+    if (!img || !img.complete) {
+      // Find the nearest loaded frame so the screen never goes blank
+      for (let offset = 1; offset < 20; offset++) {
+        const prev = imagesRef.current[index - offset];
+        if (prev && prev.complete) { img = prev; break; }
+        const next = imagesRef.current[index + offset];
+        if (next && next.complete) { img = next; break; }
+      }
+    }
+
     if (!img || !img.complete) return;
 
-    // Responsive scaling: "contain" on very narrow mobile, "cover" on desktop
     const canvasRatio = canvas.width / canvas.height;
     const imgRatio = img.width / img.height;
+    let renderWidth = canvas.width, renderHeight = canvas.height, x = 0, y = 0;
 
-    let renderWidth = canvas.width;
-    let renderHeight = canvas.height;
-    let x = 0;
-    let y = 0;
-
-    const isMobile = window.innerWidth < 768;
-
-    if (isMobile) {
-      // Mobile logic: Center and make sure it fits
+    if (window.innerWidth < 768) {
       if (canvasRatio > imgRatio) {
         renderHeight = canvas.height;
         renderWidth = canvas.height * imgRatio;
@@ -82,7 +83,6 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
         y = (canvas.height - renderHeight) / 2;
       }
     } else {
-      // Desktop logic: Cover the screen
       if (canvasRatio > imgRatio) {
         renderHeight = canvas.width / imgRatio;
         y = (canvas.height - renderHeight) / 2;
@@ -109,7 +109,7 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, [allLoaded, progress]);
+  }, [ready, progress]);
 
   useMotionValueEvent(progress, "change", (latest) => {
     const frameIndex = Math.floor(latest * (FRAME_COUNT - 1));
@@ -118,12 +118,9 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
   return (
     <>
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
       
-      {firstFrameLoaded && (
+      {ready && (
         <motion.div 
           style={{ opacity: indicatorOpacity }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center z-20 pointer-events-none"
@@ -135,11 +132,10 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
         </motion.div>
       )}
 
-      {!firstFrameLoaded && (
+      {!ready && (
         <div className="absolute inset-0 flex items-center justify-center z-[99] bg-[#050505]">
           <div className="flex flex-col items-center gap-4">
-             <div className="w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-             <p className="text-white tracking-[0.3em] text-xs font-bold">PREPARING EXPERIENCE</p>
+             <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           </div>
         </div>
       )}
