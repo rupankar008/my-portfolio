@@ -11,8 +11,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Rupankar | Creative Developer",
-  description: "Portfolio of Rupankar Bhuiya - Interactive Designer & Developer",
+  title: "Rupankar Bhuiya | Creative Developer & Interactive Designer",
+  description: "Official portfolio of Rupankar Bhuiya. Specialized in building high-performance, interactive digital experiences using Next.js, Framer Motion, and WebGL.",
+  openGraph: {
+    title: "Rupankar Bhuiya | Creative Developer",
+    description: "Building the future of interactive web experiences.",
+    url: "https://my-portfolio-snowy-one-6769afbvgc.vercel.app/",
+    siteName: "Rupankar Bhuiya Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
