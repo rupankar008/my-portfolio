@@ -5,6 +5,7 @@ import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
 import Ticker from "@/components/Ticker";
+import Terminal from "@/components/Terminal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,8 @@ export default function RootLayout({
           <Navbar />
           {children}
         </SmoothScroll>
+        {/* Terminal Easter Egg — global, outside SmoothScroll */}
+        <Terminal />
       </body>
     </html>
   );
