@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, Github, Code, Layout, Smartphone, Globe } from "lucide-react";
+import { ExternalLink, Code, Layout, Smartphone, Globe } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
 const projects = [

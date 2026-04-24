@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { User, Code, Briefcase, Zap, Github, Instagram, ArrowLeft } from "lucide-react";
+import { User, Code, Briefcase, Zap, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 
