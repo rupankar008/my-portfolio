@@ -13,11 +13,23 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 glass-nav px-6 py-4"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* CLEAN PROFESSIONAL LOGO */}
         <Link href="/" className="group relative flex items-center justify-center">
-          <div className="relative w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-pink-600 shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all duration-300 group-hover:scale-110 group-active:scale-95">
-             <span className="text-white font-black text-xl tracking-tighter">RB</span>
-             <div className="absolute inset-0 rounded-full border-2 border-white/20" />
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95 bg-black">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // If the picture isn't found, show a beautiful RB text logo as fallback
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = '<span class="text-white font-black text-xl">RB</span>';
+                  parent.className = "w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-pink-600 shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all duration-300 group-hover:scale-110";
+                }
+              }}
+            />
           </div>
         </Link>
         
