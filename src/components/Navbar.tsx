@@ -16,11 +16,10 @@ export default function Navbar() {
         <Link href="/" className="group relative flex items-center justify-center">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95 bg-black">
             <img 
-              src="/logo.png" 
+              src="https://r.jina.ai/i/0582803b9b47432fb778556810a905bc" 
               alt="Logo" 
               className="w-full h-full object-cover"
               onError={(e) => {
-                // If the picture isn't found, show a beautiful RB text logo as fallback
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 const parent = target.parentElement;
