@@ -3,8 +3,9 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { User, Code, Zap, ArrowLeft, ShieldCheck, TrendingUp, Cpu, Globe } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useDecrypt } from "@/hooks/useDecrypt";
+import MarketChart from "@/components/MarketChart";
 
 function HexagonSkill({ name, icon, color }: { name: string, icon: React.ReactNode, color: string }) {
   return (
@@ -32,6 +33,13 @@ export default function AboutPage() {
 
   const { displayText: aboutTitle, setIsHovered: setHoverTitle } = useDecrypt("MYSELF");
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  
+  const [sessionHash, setSessionHash] = useState("");
+
+  useEffect(() => {
+    const hash = Array.from({length: 32}, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    setSessionHash(hash);
+  }, []);
 
   return (
     <main ref={containerRef} className="relative min-h-screen bg-[#050505] overflow-hidden selection:bg-blue-500/30 pt-16">
@@ -68,11 +76,8 @@ export default function AboutPage() {
                  a creative technologist based in <span className="text-white/80">Burdwan, West Bengal</span>.
                </p>
                <p>
-                 An ISC 12th graduate with a specialized focus on building high-frequency digital experiences 
-                 and secure cryptographic systems.
-               </p>
-               <p className="text-sm uppercase tracking-[0.3em] text-blue-400 font-bold">
-                 // System_Status: Operational
+                 Specializing in the intersection of <span className="text-white font-bold">Web Technology</span> and 
+                 <span className="text-white font-bold"> Financial Markets</span>.
                </p>
             </div>
 
@@ -84,41 +89,34 @@ export default function AboutPage() {
                 <HexagonSkill name="Crypto" icon={<ShieldCheck size={24} />} color="purple" />
                 <HexagonSkill name="Trading" icon={<TrendingUp size={24} />} color="green" />
                 <HexagonSkill name="Systems" icon={<Cpu size={24} />} color="pink" />
-                <HexagonSkill name="WebGL" icon={<Globe size={24} />} color="blue" />
               </div>
             </div>
           </motion.div>
 
-          {/* Right: Vision Cards */}
+          {/* Right: Market Chart */}
           <div className="space-y-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl relative overflow-hidden group"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors" />
-              <h2 className="text-3xl font-black mb-6 tracking-tight">Indian Stock Market</h2>
-              <p className="text-white/40 leading-relaxed">
-                Applying algorithmic logic and technical analysis to navigate the complexities of the Indian markets. 
-                My approach combines discipline with data-driven decision making.
-              </p>
-            </motion.div>
+            <h3 className="text-xs uppercase tracking-[0.5em] text-white/30 font-bold mb-4">Real_Time_Analytics</h3>
+            <MarketChart />
 
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="p-10 rounded-[3rem] bg-gradient-to-br from-purple-500/10 to-transparent border border-white/10 backdrop-blur-2xl"
-            >
+            <div className="p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl">
               <h2 className="text-3xl font-black mb-6 tracking-tight">Cryptography</h2>
-              <p className="text-white/40 leading-relaxed">
-                Exploring the frontiers of decentralized finance and secure communication. I believe 
-                cryptography is the ultimate tool for personal and financial sovereignty in the digital age.
+              <p className="text-white/40 leading-relaxed italic">
+                "Code is law. In the realm of bits and hashes, truth is mathematical."
               </p>
-            </motion.div>
+            </div>
           </div>
         </div>
+
+        {/* CRYPTO FOOTER SIGNATURE */}
+        <footer className="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+           <div className="flex flex-col gap-1">
+              <span className="text-[10px] uppercase tracking-[0.5em] text-white/20 font-bold">Session_Signature</span>
+              <span className="text-[9px] font-mono text-blue-500/50 break-all max-w-md">{sessionHash}</span>
+           </div>
+           <div className="text-[10px] uppercase tracking-[0.3em] text-white/10">
+              © 2026 RB_VOID // EST. 200X
+           </div>
+        </footer>
       </div>
     </main>
   );
