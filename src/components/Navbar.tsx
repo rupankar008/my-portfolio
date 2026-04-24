@@ -10,7 +10,7 @@ export default function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-      className="fixed top-0 left-0 right-0 z-50 glass-nav px-6 py-4"
+      className="fixed top-10 left-0 right-0 z-50 glass-nav px-6 py-4"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* CUSTOM ILLUSTRATED SVG LOGO */}
