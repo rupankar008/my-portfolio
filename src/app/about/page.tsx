@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { User, Code, Zap, ArrowLeft, Briefcase } from "lucide-react";
+import { User, Code, Zap, ArrowLeft, Briefcase, TrendingUp, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 
@@ -49,7 +49,7 @@ export default function AboutPage() {
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
   return (
-    <main ref={containerRef} className="relative min-h-screen bg-[#050505] overflow-hidden selection:bg-purple-500/30">
+    <main ref={containerRef} className="relative min-h-screen bg-[#050505] overflow-hidden selection:bg-blue-500/30">
       {/* Dynamic Background */}
       <motion.div 
         style={{ y: backgroundY }}
@@ -72,28 +72,31 @@ export default function AboutPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-7xl font-black tracking-tighter mb-8">
-              ABOUT <br />
+            <h1 className="text-7xl font-black tracking-tighter mb-8 leading-none">
+              RUPANKAR <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-                MYSELF
+                BHUIYA
               </span>
             </h1>
-            <p className="text-xl text-white/60 font-light leading-relaxed mb-10">
-              I am a creative developer who believes that the web should be an experience, not just a tool. 
-              My journey started with a fascination for interactive art, which evolved into a professional 
-              career building high-performance digital products.
+            <p className="text-xl text-white/60 font-light leading-relaxed mb-6">
+              Based in <span className="text-white font-medium">Burdwan, West Bengal</span>. 
+              An ISC 12th graduate with a relentless passion for the intersection of 
+              <span className="text-white font-medium"> Technology, Cryptography, and Markets.</span>
+            </p>
+            <p className="text-white/40 leading-relaxed mb-10 italic">
+              "I build systems that bridge the gap between digital security and financial freedom."
             </p>
 
             <div className="grid grid-cols-2 gap-6">
               <TiltCard className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
-                <Zap className="text-blue-400 mb-4" size={32} />
-                <h3 className="font-bold text-lg mb-1 text-white">Performance</h3>
-                <p className="text-sm text-white/40">Optimized, fast, and lightweight code.</p>
+                <ShieldCheck className="text-blue-400 mb-4" size={32} />
+                <h3 className="font-bold text-lg mb-1 text-white">Cryptography</h3>
+                <p className="text-sm text-white/40">Exploring secure digital systems.</p>
               </TiltCard>
               <TiltCard className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
-                <Code className="text-purple-400 mb-4" size={32} />
-                <h3 className="font-bold text-lg mb-1 text-white">Interactive</h3>
-                <p className="text-sm text-white/40">Immersive animations and transitions.</p>
+                <TrendingUp className="text-green-400 mb-4" size={32} />
+                <h3 className="font-bold text-lg mb-1 text-white">Trading</h3>
+                <p className="text-sm text-white/40">Indian Stock & Crypto Markets.</p>
               </TiltCard>
             </div>
           </motion.div>
@@ -106,24 +109,29 @@ export default function AboutPage() {
             className="space-y-6"
           >
             <div className="p-10 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-transparent border border-white/10 backdrop-blur-3xl relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <User size={120} />
-               </div>
                <h2 className="text-3xl font-bold mb-6">Expertise</h2>
-               <div className="space-y-4">
-                  {["Next.js / React", "Framer Motion", "Three.js / WebGL", "UI/UX Design", "TypeScript"].map((skill) => (
-                    <div key={skill} className="flex items-center gap-3">
-                       <div className="w-2 h-2 rounded-full bg-blue-500" />
-                       <span className="text-white/80 font-medium">{skill}</span>
+               <div className="grid grid-cols-1 gap-4">
+                  {[
+                    { name: "Full Stack Coding", icon: <Code size={18} className="text-blue-500" /> },
+                    { name: "System Technology", icon: <Zap size={18} className="text-yellow-500" /> },
+                    { name: "Crypto Strategy", icon: <ShieldCheck size={18} className="text-purple-500" /> },
+                    { name: "Stock Market Analysis", icon: <TrendingUp size={18} className="text-green-500" /> }
+                  ].map((skill) => (
+                    <div key={skill.name} className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 hover:border-white/20 transition-all">
+                       {skill.icon}
+                       <span className="text-white/80 font-medium">{skill.name}</span>
                     </div>
                   ))}
                </div>
             </div>
 
             <div className="p-10 rounded-[2.5rem] bg-white/5 border border-white/10 backdrop-blur-2xl">
-               <h2 className="text-3xl font-bold mb-6">Vision</h2>
-               <p className="text-white/60 leading-relaxed italic">
-                 "I don't just build websites. I build digital worlds where every pixel tells a story and every interaction creates a memory."
+               <h2 className="text-3xl font-bold mb-6">Lifestyle</h2>
+               <p className="text-white/60 leading-relaxed">
+                 When I'm not in front of a code editor, you'll find me analyzing charts in the 
+                 <span className="text-white font-medium"> Indian Stock Market</span> or exploring the 
+                 latest breakthroughs in the <span className="text-white font-medium">Crypto Ecosystem</span>. 
+                 Trading is not just a hobby—it's a discipline.
                </p>
             </div>
           </motion.div>
