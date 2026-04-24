@@ -49,14 +49,14 @@ export default function Overlay({ progress }: OverlayProps) {
         <p className="text-xl md:text-2xl text-white/80 font-light leading-relaxed mb-8 drop-shadow-md">
           Crafting immersive, high-performance interfaces that bridge the gap between complex engineering and beautiful design. I specialize in React, Next.js, and WebGL animations.
         </p>
-        <div className="flex items-center gap-4">
-          <Link href="/about" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/10 border border-white/20 backdrop-blur-md px-8 py-4 font-medium text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300 hover:bg-white/20 hover:scale-105 active:scale-95">
-            <span className="relative flex items-center gap-2 text-sm uppercase tracking-widest font-bold">
-              <User size={18} />
+        <div className="flex flex-wrap gap-4 relative z-[100] pointer-events-auto">
+            <Link 
+              href="/about" 
+              className="inline-block px-10 py-5 bg-white text-black rounded-full font-bold text-lg hover:scale-105 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.5)]"
+            >
               About Me
-            </span>
-          </Link>
-        </div>
+            </Link>
+          </div>
       </motion.div>
 
       {/* Section 3: Contact */}
