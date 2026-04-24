@@ -13,8 +13,14 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 glass-nav px-6 py-4"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="group flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-pink-500 text-white font-black text-xl shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:scale-110 hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] transition-all">
-          RB
+        <Link href="/" className="group relative flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-full h-full object-cover"
+            />
+          </div>
         </Link>
         
         <div className="flex items-center gap-3 md:gap-8 bg-black/20 backdrop-blur-md px-4 md:px-8 py-3 rounded-full border border-white/10 shadow-2xl pointer-events-auto">
