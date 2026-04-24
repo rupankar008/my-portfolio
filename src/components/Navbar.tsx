@@ -16,13 +16,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="group relative flex items-center justify-center">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-transform duration-300 group-hover:scale-110 group-active:scale-95 bg-gradient-to-tr from-blue-500 to-pink-500">
-            <Image 
-              src="/logo.png" 
+            <img 
+              src="https://r.jina.ai/i/0582803b9b47432fb778556810a905bc" 
               alt="Logo" 
-              width={48}
-              height={48}
               className="w-full h-full object-cover"
-              priority
             />
           </div>
         </Link>
