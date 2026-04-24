@@ -71,7 +71,7 @@ export default function Overlay({ progress }: OverlayProps) {
           Transforming abstract concepts into functional, interactive realities through code.
         </p>
         
-        <div className="flex justify-end">
+        <div className="flex justify-end pointer-events-auto">
           <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vmtolegit@gmail.com" target="_blank" rel="noreferrer" className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-8 py-4 font-medium text-slate-900 shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300 hover:scale-105 active:scale-95">
             <span className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 transition-opacity duration-300 group-hover:opacity-20"></span>
             <span className="relative flex items-center gap-3 font-bold text-lg">

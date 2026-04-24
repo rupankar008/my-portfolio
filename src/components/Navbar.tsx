@@ -17,14 +17,14 @@ export default function Navbar() {
           RB
         </Link>
         
-        <div className="hidden md:flex items-center gap-8">
-          <Link href="/about" className="text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
+        <div className="flex items-center gap-3 md:gap-8 bg-black/20 backdrop-blur-md px-4 md:px-8 py-3 rounded-full border border-white/10 shadow-2xl pointer-events-auto">
+          <Link href="/about" className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             About
           </Link>
-          <Link href="/#projects" className="text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
+          <Link href="/#projects" className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             Projects
           </Link>
-          <Link href="/contact" className="text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
+          <Link href="/contact" className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             Contact
           </Link>
         </div>
