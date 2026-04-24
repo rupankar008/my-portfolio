@@ -4,6 +4,7 @@ import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
+import Ticker from "@/components/Ticker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-[#050505] text-white antialiased selection:bg-blue-500/30`}>
+        <Ticker />
         <div className="grain-overlay" />
         <SmoothScroll>
           <CustomCursor />

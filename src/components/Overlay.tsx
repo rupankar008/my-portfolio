@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useRef } from "react";
 import MagneticButton from "./MagneticButton";
+import { useDecrypt } from "@/hooks/useDecrypt";
 
 export default function Overlay() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -13,13 +14,17 @@ export default function Overlay() {
   const titleSkew = useTransform(scrollYProgress, [0, 0.2], [0, -5]);
   const titleX = useTransform(scrollYProgress, [0, 0.2], [0, -20]);
 
+  // DECRYPTION EFFECTS
+  const { displayText: nameText, setIsHovered: setHoverName } = useDecrypt("RUPANKAR");
+  const { displayText: lastNameText, setIsHovered: setHoverLastName } = useDecrypt("BHUIYA");
+
   return (
     <div ref={containerRef} className="relative z-10 w-full">
       {/* SECTION 1: HERO */}
       <section className="min-h-screen flex flex-col justify-center px-6 md:px-20 py-20 relative overflow-hidden">
         <motion.div 
           style={{ skewY: titleSkew, x: titleX }}
-          className="max-w-4xl"
+          className="max-w-4xl pt-10"
         >
           <motion.h2 
             initial={{ opacity: 0, letterSpacing: "1em" }}
@@ -30,10 +35,14 @@ export default function Overlay() {
             The Digital Visionary
           </motion.h2>
           
-          <h1 className="text-6xl md:text-[10rem] font-black tracking-tighter mb-8 leading-[0.8] mix-blend-difference">
-            RUPANKAR <br /> 
+          <h1 
+            onMouseEnter={() => { setHoverName(true); setHoverLastName(true); }}
+            onMouseLeave={() => { setHoverName(false); setHoverLastName(false); }}
+            className="text-6xl md:text-[10rem] font-black tracking-tighter mb-8 leading-[0.8] mix-blend-difference cursor-default"
+          >
+            {nameText} <br /> 
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-              BHUIYA
+              {lastNameText}
             </span>
           </h1>
           
