@@ -5,35 +5,65 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { Html } from "@react-three/drei";
 
-function WireframeGlobe() {
+function RealisticGlobe() {
   const meshRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  
+  // Load textures
+  const textureLoader = new THREE.TextureLoader();
+  const earthTexture = useMemo(() => textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg"), []);
+  const specularMap = useMemo(() => textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg"), []);
+  const normalMap = useMemo(() => textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg"), []);
 
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.002;
+      meshRef.current.rotation.y += 0.0015;
+    }
+    if (glowRef.current) {
+      glowRef.current.rotation.y += 0.0015;
     }
   });
 
   return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[2, 32, 32]} />
-      <meshBasicMaterial color="#1e3a8a" wireframe transparent opacity={0.3} />
-      
-      {/* Marker for India (approximate coordinate to spherical map) */}
-      <mesh position={[1.4, 0.8, 1.1]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
-        <meshBasicMaterial color="#ec4899" />
-        <Html position={[0, 0.2, 0]} center>
-          <div className="flex flex-col items-center pointer-events-none">
-            <div className="w-2 h-2 rounded-full bg-pink-500 animate-ping absolute" />
-            <div className="w-2 h-2 rounded-full bg-pink-500 relative z-10" />
-            <div className="mt-2 px-2 py-1 bg-black/80 border border-pink-500/50 rounded text-[10px] text-pink-400 font-mono whitespace-nowrap backdrop-blur-md">
-              BURDWAN, IN
+    <group>
+      {/* The Actual Earth */}
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[2.2, 64, 64]} />
+        <meshPhongMaterial 
+          map={earthTexture}
+          specularMap={specularMap}
+          normalMap={normalMap}
+          specular={new THREE.Color(0x333333)}
+          shininess={5}
+        />
+        
+        {/* Marker for India (Burdwan) */}
+        <mesh position={[1.5, 0.9, 1.3]}>
+          <sphereGeometry args={[0.06, 16, 16]} />
+          <meshBasicMaterial color="#ec4899" />
+          <Html position={[0, 0.2, 0]} center>
+            <div className="flex flex-col items-center pointer-events-none">
+              <div className="w-2 h-2 rounded-full bg-pink-500 animate-ping absolute" />
+              <div className="w-2 h-2 rounded-full bg-pink-500 relative z-10 shadow-[0_0_10px_#ec4899]" />
+              <div className="mt-2 px-2 py-1 bg-black/80 border border-pink-500/50 rounded text-[9px] text-pink-400 font-mono whitespace-nowrap backdrop-blur-md">
+                BURDWAN, IN
+              </div>
             </div>
-          </div>
-        </Html>
+          </Html>
+        </mesh>
       </mesh>
-    </mesh>
+
+      {/* Atmospheric Glow */}
+      <mesh ref={glowRef}>
+        <sphereGeometry args={[2.25, 64, 64]} />
+        <meshBasicMaterial 
+          color="#60a5fa" 
+          transparent 
+          opacity={0.15} 
+          wireframe
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -76,7 +106,7 @@ export default function GlobeTracker() {
 
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }} className="cursor-crosshair">
         <ambientLight intensity={1} />
-        <WireframeGlobe />
+        <RealisticGlobe />
       </Canvas>
     </div>
   );
