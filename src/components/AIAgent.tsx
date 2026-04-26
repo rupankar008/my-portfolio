@@ -23,9 +23,25 @@ export default function AIAgent() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Persistence: Load messages on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("jarvis_chat_history");
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    }
+  }, []);
+
+  // Persistence: Save messages on change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("jarvis_chat_history", JSON.stringify(messages));
+    }
+  }, [messages]);
+
   // Initial Greeting
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    const saved = localStorage.getItem("jarvis_chat_history");
+    if (isOpen && !saved && messages.length === 0) {
       setIsTyping(true);
       setTimeout(() => {
         setMessages([
@@ -41,7 +57,10 @@ export default function AIAgent() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [messages, isTyping]);
 
@@ -88,7 +107,7 @@ export default function AIAgent() {
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
-            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col md:flex-row"
+            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col md:flex-row h-[100dvh] overflow-hidden"
           >
             {/* Sidebar / Info */}
             <div className="w-full md:w-80 border-r border-white/5 p-8 flex flex-col justify-between bg-blue-900/5">
@@ -103,7 +122,7 @@ export default function AIAgent() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-6 hidden md:block">
                   <div>
                     <h4 className="text-[10px] text-blue-400 uppercase font-bold mb-2 tracking-widest">Core Directive</h4>
                     <p className="text-xs text-white/60 leading-relaxed">To represent Rupankar's portfolio with maximum efficiency and clarify technical capabilities to potential collaborators.</p>
@@ -115,12 +134,23 @@ export default function AIAgent() {
                 </div>
               </div>
 
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/10 text-white/50 hover:bg-white/5 transition-all text-xs"
-              >
-                <X size={16} /> Close Connection
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem("jarvis_chat_history");
+                    setMessages([]);
+                  }}
+                  className="flex-1 py-3 rounded-xl border border-red-500/20 text-red-400/50 hover:bg-red-500/5 transition-all text-[10px] uppercase tracking-widest"
+                >
+                  Clear Memory
+                </button>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-white/50 hover:bg-white/5 transition-all text-xs"
+                >
+                  <X size={16} /> Close
+                </button>
+              </div>
             </div>
 
             {/* Chat Interface */}

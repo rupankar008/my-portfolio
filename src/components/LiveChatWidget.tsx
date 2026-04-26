@@ -27,10 +27,28 @@ export default function LiveChatWidget() {
   const lastActivityRef = useRef<number>(Date.now());
   const heartbeatRef = useRef<any>(null);
 
+  // Persistence: Load messages on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("live_chat_history");
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    }
+  }, []);
+
+  // Persistence: Save messages on change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("live_chat_history", JSON.stringify(messages));
+    }
+  }, [messages]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth"
+      });
     }
   }, [messages, isOpen]);
 
@@ -273,7 +291,18 @@ export default function LiveChatWidget() {
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white transition-colors"><X size={18} /></button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem("live_chat_history");
+                    setMessages([]);
+                  }}
+                  className="text-[8px] text-red-500/40 hover:text-red-500 uppercase tracking-tighter"
+                >
+                  Clear
+                </button>
+                <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white transition-colors"><X size={18} /></button>
+              </div>
             </div>
 
             <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-gradient-to-b from-transparent to-blue-900/5">
