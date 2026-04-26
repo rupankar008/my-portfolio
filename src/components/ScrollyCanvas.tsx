@@ -24,6 +24,8 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
   const indicatorOpacity = useTransform(progress, [0, 0.05], [1, 0]);
 
+  const animationFrameRef = useRef<number>();
+
   useEffect(() => {
     const images: HTMLImageElement[] = [];
     imagesRef.current = images;
@@ -36,47 +38,64 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
       setReady(true);
       drawImage(0);
 
-      // Once the first frame is loaded, request the rest
-      for (let i = 1; i < FRAME_COUNT; i++) {
+      // Load the rest sequentially to prevent mobile network/memory freeze
+      let currentIndex = 1;
+      const loadNext = () => {
+        if (currentIndex >= FRAME_COUNT) return;
         const img = new Image();
-        img.src = getFrameUrl(i);
-        images[i] = img;
-      }
+        img.src = getFrameUrl(currentIndex);
+        img.onload = () => {
+          images[currentIndex] = img;
+          currentIndex++;
+          loadNext();
+        };
+        img.onerror = () => {
+          currentIndex++;
+          loadNext();
+        };
+      };
+      loadNext();
     };
   }, []);
 
   const drawImage = (index: number) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
 
-    let img = imagesRef.current[index];
-    if (!img || !img.complete) {
-      for (let offset = 1; offset < 20; offset++) {
-        const prev = imagesRef.current[index - offset];
-        if (prev && prev.complete) { img = prev; break; }
-        const next = imagesRef.current[index + offset];
-        if (next && next.complete) { img = next; break; }
+    animationFrameRef.current = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d", { alpha: false });
+      if (!canvas || !ctx) return;
+
+      let img = imagesRef.current[index];
+      if (!img || !img.complete) {
+        for (let offset = 1; offset < 20; offset++) {
+          const prev = imagesRef.current[index - offset];
+          if (prev && prev.complete) { img = prev; break; }
+          const next = imagesRef.current[index + offset];
+          if (next && next.complete) { img = next; break; }
+        }
       }
-    }
 
-    if (!img || !img.complete) return;
+      if (!img || !img.complete) return;
 
-    // ORIGINAL CINEMATIC "COVER" LOGIC
-    const canvasRatio = canvas.width / canvas.height;
-    const imgRatio = img.width / img.height;
-    let renderWidth = canvas.width, renderHeight = canvas.height, x = 0, y = 0;
+      // ORIGINAL CINEMATIC "COVER" LOGIC
+      const canvasRatio = canvas.width / canvas.height;
+      const imgRatio = img.width / img.height;
+      let renderWidth = canvas.width, renderHeight = canvas.height, x = 0, y = 0;
 
-    if (canvasRatio > imgRatio) {
-      renderHeight = canvas.width / imgRatio;
-      y = (canvas.height - renderHeight) / 2;
-    } else {
-      renderWidth = canvas.height * imgRatio;
-      x = (canvas.width - renderWidth) / 2;
-    }
+      if (canvasRatio > imgRatio) {
+        renderHeight = canvas.width / imgRatio;
+        y = (canvas.height - renderHeight) / 2;
+      } else {
+        renderWidth = canvas.height * imgRatio;
+        x = (canvas.width - renderWidth) / 2;
+      }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, x, y, renderWidth, renderHeight);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, x, y, renderWidth, renderHeight);
+    });
   };
 
   useEffect(() => {
