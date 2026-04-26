@@ -18,12 +18,14 @@ export default function LiveChatWidget() {
   const [status, setStatus] = useState<"offline" | "connecting" | "online">("offline");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   
   const peerRef = useRef<Peer | null>(null);
   const connRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastActivityRef = useRef<number>(Date.now());
+  const heartbeatRef = useRef<any>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -73,6 +75,18 @@ export default function LiveChatWidget() {
     }
   }, []);
 
+  // Heartbeat to keep connection alive
+  useEffect(() => {
+    if (status === "online" && connRef.current) {
+      heartbeatRef.current = setInterval(() => {
+        connRef.current.send({ type: "ping" });
+      }, 10000);
+    } else {
+      clearInterval(heartbeatRef.current);
+    }
+    return () => clearInterval(heartbeatRef.current);
+  }, [status]);
+
   const initializePeer = (asAdmin: boolean) => {
     import("peerjs").then(({ default: Peer }) => {
       const peerId = asAdmin ? "rupankar-admin-terminal-v1" : undefined;
@@ -98,6 +112,7 @@ export default function LiveChatWidget() {
         }, 1000);
 
         conn.on("data", (data: any) => {
+          if (data.type === "ping") return;
           lastActivityRef.current = Date.now();
           if (data.type === "image") {
             setMessages(prev => [...prev, { sender: "GUEST", image: data.content, time: new Date().toLocaleTimeString() }]);
@@ -153,6 +168,7 @@ export default function LiveChatWidget() {
       });
 
       conn.on("data", (data: any) => {
+        if (data.type === "ping") return;
         lastActivityRef.current = Date.now();
         if (data.type === "image") {
           setMessages(prev => [...prev, { sender: "DEV", image: data.content, time: new Date().toLocaleTimeString() }]);
@@ -160,6 +176,11 @@ export default function LiveChatWidget() {
           setMessages(prev => [...prev, { sender: "DEV", text: data.content, time: new Date().toLocaleTimeString() }]);
         }
         new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
+      });
+
+      conn.on("close", () => {
+        setStatus("offline");
+        setMessages(prev => [...prev, { sender: "DEV", text: "Developer disconnected.", time: new Date().toLocaleTimeString() }]);
       });
     };
 
@@ -214,6 +235,24 @@ export default function LiveChatWidget() {
       </motion.button>
 
       <AnimatePresence>
+        {expandedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setExpandedImage(null)}
+            className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-xl flex items-center justify-center p-8 cursor-zoom-out"
+          >
+            <motion.img
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              src={expandedImage}
+              className="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/10"
+            />
+            <button className="absolute top-8 right-8 text-white/50 hover:text-white"><X size={32} /></button>
+          </motion.div>
+        )}
+
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 100, scale: 0.8 }}
@@ -242,7 +281,7 @@ export default function LiveChatWidget() {
                 <div key={i} className={`flex flex-col ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "items-end" : "items-start"}`}>
                   <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "bg-blue-600 text-white rounded-tr-none" : "bg-white/10 text-white/90 border border-white/5 rounded-tl-none"}`}>
                     {msg.image ? (
-                      <img src={msg.image} alt="shared" className="rounded-lg max-w-full h-auto cursor-pointer" onClick={() => window.open(msg.image)} />
+                      <img src={msg.image} alt="shared" className="rounded-lg max-w-full h-auto cursor-zoom-in" onClick={() => setExpandedImage(msg.image!)} />
                     ) : (
                       msg.text
                     )}
