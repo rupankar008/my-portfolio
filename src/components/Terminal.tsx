@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X } from "lucide-react";
+import type Peer from "peerjs";
 
 const responses: Record<string, string[]> = {
   help: [
@@ -12,6 +13,7 @@ const responses: Record<string, string[]> = {
     "  projects   — Show projects",
     "  contact    — Get contact info",
     "  crypto     — Crypto philosophy",
+    "  chat       — Live P2P chat with Developer",
     "  clear      — Clear terminal",
     "  exit       — Close terminal",
   ],
@@ -53,8 +55,6 @@ const responses: Record<string, string[]> = {
     "  ETH: World Computer",
     "  NIFTY: The Indian Story",
   ],
-  clear: ["__CLEAR__"],
-  exit: ["__EXIT__"],
 };
 
 export default function Terminal() {
@@ -65,8 +65,12 @@ export default function Terminal() {
     { type: "output", text: 'Type "help" for commands.' },
     { type: "output", text: "─────────────────────────" },
   ]);
+  const [chatMode, setChatMode] = useState<"idle" | "connecting" | "chatting" | "admin">("idle");
+  
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const peerRef = useRef<Peer | null>(null);
+  const connRef = useRef<any>(null);
 
   // Secret: type "void" anywhere on the page
   useEffect(() => {
@@ -92,39 +96,133 @@ export default function Terminal() {
   }, [history]);
 
   const handleCommand = useCallback(() => {
-    const cmd = input.trim().toLowerCase();
+    const cmd = input.trim();
     if (!cmd) return;
 
-    const newHistory = [...history, { type: "input" as const, text: `> ${cmd}` }];
-
-    if (cmd === "clear") {
-      setHistory([{ type: "output", text: "Terminal cleared." }]);
-    } else if (cmd === "exit") {
+    if (cmd.toLowerCase() === "exit") {
+      if (chatMode !== "idle") {
+        connRef.current?.close();
+        peerRef.current?.destroy();
+        setChatMode("idle");
+        setHistory((h) => [...h, { type: "input", text: "> exit" }, { type: "output", text: "[P2P] Disconnected." }]);
+        setInput("");
+        return;
+      }
       setOpen(false);
-    } else if (cmd === "sudo hack") {
+      setInput("");
+      return;
+    }
+
+    if (chatMode === "chatting" || chatMode === "admin") {
+      const prefix = chatMode === "admin" ? "[DEV]" : "[ME]";
+      setHistory((h) => [...h, { type: "input", text: `${prefix}: ${cmd}` }]);
+      connRef.current?.send(cmd);
+      setInput("");
+      return;
+    }
+
+    const cmdLower = cmd.toLowerCase();
+    const newHistory = [...history, { type: "input" as const, text: `> ${cmdLower}` }];
+
+    if (cmdLower === "clear") {
+      setHistory([{ type: "output", text: "Terminal cleared." }]);
+    } else if (cmdLower === "sudo hack") {
       document.body.classList.toggle("meltdown");
       newHistory.push({ type: "output", text: "MELTDOWN PROTOCOL INITIATED..." });
       newHistory.push({ type: "output", text: "ACCESS GRANTED." });
       setHistory(newHistory);
       
-      // Also play an alarm sound if audio system is active
       if (typeof window !== "undefined") {
-        import('@/lib/AudioSystem').then(({ audioSystem }) => {
-          audioSystem.playHover(); // as a fallback beep
-        });
+        import('@/lib/AudioSystem').then(({ audioSystem }) => audioSystem.playHover());
       }
+    } else if (cmdLower === "chat") {
+      newHistory.push({ type: "output", text: "Connecting to secure P2P channel..." });
+      setHistory(newHistory);
+      setChatMode("connecting");
+
+      import("peerjs").then(({ default: Peer }) => {
+        const peer = new Peer();
+        peerRef.current = peer;
+
+        peer.on("open", () => {
+          const conn = peer.connect("rupankar-admin-terminal-v1");
+          connRef.current = conn;
+          
+          let connected = false;
+
+          conn.on("open", () => {
+            connected = true;
+            setChatMode("chatting");
+            setHistory((h) => [...h, { type: "output", text: "[P2P SECURE] Connected to Developer." }]);
+          });
+
+          conn.on("data", (data) => {
+            setHistory((h) => [...h, { type: "output", text: `[DEV]: ${data}` }]);
+            if (typeof window !== "undefined") {
+              import('@/lib/AudioSystem').then(({ audioSystem }) => audioSystem.playHover());
+            }
+          });
+
+          conn.on("close", () => {
+            setChatMode("idle");
+            setHistory((h) => [...h, { type: "output", text: "[P2P SECURE] Connection closed." }]);
+          });
+          
+          setTimeout(() => {
+            if (!connected) {
+               setChatMode("idle");
+               setHistory((h) => [...h, { type: "output", text: "Developer is currently offline." }]);
+               peer.destroy();
+            }
+          }, 4000);
+        });
+      });
+    } else if (cmdLower === "sudo admin") {
+      newHistory.push({ type: "output", text: "Initializing Admin Node..." });
+      setHistory(newHistory);
+      setChatMode("admin");
+
+      import("peerjs").then(({ default: Peer }) => {
+        const peer = new Peer("rupankar-admin-terminal-v1");
+        peerRef.current = peer;
+
+        peer.on("open", (id) => {
+          setHistory((h) => [...h, { type: "output", text: `Listening on secure channel...` }]);
+        });
+
+        peer.on("connection", (conn) => {
+          connRef.current = conn;
+          setHistory((h) => [...h, { type: "output", text: `[P2P] Peer connected.` }]);
+
+          conn.on("data", (data) => {
+            setHistory((h) => [...h, { type: "output", text: `[GUEST]: ${data}` }]);
+            if (typeof window !== "undefined") {
+              import('@/lib/AudioSystem').then(({ audioSystem }) => audioSystem.playHover());
+            }
+          });
+          
+          conn.on("close", () => {
+            setHistory((h) => [...h, { type: "output", text: `[P2P] Peer disconnected.` }]);
+            connRef.current = null;
+          });
+        });
+        
+        peer.on("error", (err) => {
+          setHistory((h) => [...h, { type: "output", text: `[ERROR]: ${err.type}` }]);
+          setChatMode("idle");
+        });
+      });
     } else {
-      const res = responses[cmd] ?? [`Command not found: "${cmd}". Type "help".`];
+      const res = responses[cmdLower] ?? [`Command not found: "${cmdLower}". Type "help".`];
       res.forEach((line) => newHistory.push({ type: "output", text: line }));
       setHistory(newHistory);
     }
 
     setInput("");
-  }, [input, history]);
+  }, [input, history, chatMode]);
 
   return (
     <>
-      {/* Hidden trigger hint */}
       <div className="fixed bottom-6 left-6 z-40 text-[9px] font-mono text-white/10 hover:text-white/30 transition-colors cursor-default select-none">
         [type "void" to access terminal]
       </div>
@@ -145,7 +243,9 @@ export default function Terminal() {
                 <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
                 <div className="w-3 h-3 rounded-full bg-green-500/70" />
               </div>
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">RUPANKAR_OS // Terminal</span>
+              <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">
+                {chatMode === "idle" ? "RUPANKAR_OS // Terminal" : "P2P SECURE CHAT"}
+              </span>
               <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white transition-colors">
                 <X size={14} />
               </button>
@@ -163,14 +263,16 @@ export default function Terminal() {
 
             {/* Input */}
             <div className="flex items-center gap-2 px-4 py-3 border-t border-white/5">
-              <span className="text-blue-400 font-mono text-sm">$</span>
+              <span className="text-blue-400 font-mono text-sm">
+                {chatMode === "idle" ? "$" : ">"}
+              </span>
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCommand()}
                 className="flex-1 bg-transparent font-mono text-sm text-white outline-none placeholder-white/20"
-                placeholder="type a command..."
+                placeholder={chatMode === "idle" ? "type a command..." : "type a message (exit to quit)..."}
                 autoComplete="off"
                 spellCheck={false}
               />
