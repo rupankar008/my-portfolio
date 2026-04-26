@@ -21,26 +21,24 @@ export default function AIAgent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Persistence: Load messages on mount
+  // Persistence: Load messages on mount (Session Only)
   useEffect(() => {
-    const saved = localStorage.getItem("jarvis_chat_history");
+    const saved = sessionStorage.getItem("jarvis_chat_history");
     if (saved) {
       setMessages(JSON.parse(saved));
     }
   }, []);
 
-  // Persistence: Save messages on change
+  // Persistence: Save messages on change (Session Only)
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem("jarvis_chat_history", JSON.stringify(messages));
+      sessionStorage.setItem("jarvis_chat_history", JSON.stringify(messages));
     }
   }, [messages]);
 
   // Initial Greeting
   useEffect(() => {
-    const saved = localStorage.getItem("jarvis_chat_history");
+    const saved = sessionStorage.getItem("jarvis_chat_history");
     if (isOpen && !saved && messages.length === 0) {
       setIsTyping(true);
       setTimeout(() => {
@@ -103,14 +101,10 @@ export default function AIAgent() {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 100 }}
-            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col md:flex-row h-[100dvh] overflow-hidden"
+            className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col md:flex-row h-screen overflow-hidden overscroll-none"
           >
-            {/* Sidebar / Info */}
-            <div className="w-full md:w-80 border-r border-white/5 p-8 flex flex-col justify-between bg-blue-900/5">
+            {/* Sidebar / Info - Hidden on Mobile Chat */}
+            <div className="hidden md:flex w-80 border-r border-white/5 p-8 flex-col justify-between bg-blue-900/5">
               <div>
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-12 h-12 rounded-xl bg-blue-600/20 flex items-center justify-center border border-blue-500/30">
@@ -137,20 +131,29 @@ export default function AIAgent() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => {
-                    localStorage.removeItem("jarvis_chat_history");
+                    sessionStorage.removeItem("jarvis_chat_history");
                     setMessages([]);
                   }}
                   className="flex-1 py-3 rounded-xl border border-red-500/20 text-red-400/50 hover:bg-red-500/5 transition-all text-[10px] uppercase tracking-widest"
                 >
-                  Clear Memory
+                  Reset
                 </button>
                 <button 
                   onClick={() => setIsOpen(false)}
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-white/50 hover:bg-white/5 transition-all text-xs"
                 >
-                  <X size={16} /> Close
+                  Close
                 </button>
               </div>
+            </div>
+
+            {/* Mobile Header (Visible only on mobile) */}
+            <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-black/40">
+              <div className="flex items-center gap-2">
+                 <Terminal size={16} className="text-blue-400" />
+                 <span className="text-sm font-bold text-white">JARVIS</span>
+              </div>
+              <button onClick={() => setIsOpen(false)} className="text-white/40"><X size={20} /></button>
             </div>
 
             {/* Chat Interface */}

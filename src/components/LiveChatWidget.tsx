@@ -28,18 +28,18 @@ export default function LiveChatWidget() {
   const lastActivityRef = useRef<number>(Date.now());
   const heartbeatRef = useRef<any>(null);
 
-  // Persistence: Load messages on mount
+  // Persistence: Load messages on mount (Session Only)
   useEffect(() => {
-    const saved = localStorage.getItem("live_chat_history");
+    const saved = sessionStorage.getItem("live_chat_history");
     if (saved) {
       setMessages(JSON.parse(saved));
     }
   }, []);
 
-  // Persistence: Save messages on change
+  // Persistence: Save messages on change (Session Only)
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem("live_chat_history", JSON.stringify(messages));
+      sessionStorage.setItem("live_chat_history", JSON.stringify(messages));
     }
   }, [messages]);
 
@@ -295,7 +295,7 @@ export default function LiveChatWidget() {
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => {
-                    localStorage.removeItem("live_chat_history");
+                    sessionStorage.removeItem("live_chat_history");
                     setMessages([]);
                   }}
                   className="text-[8px] text-red-500/40 hover:text-red-500 uppercase tracking-tighter"
