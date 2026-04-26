@@ -28,8 +28,6 @@ export default function BootLoader({ onComplete }: { onComplete: () => void }) {
         setLines((prev) => [...prev, bootLines[i]]);
         i++;
       } else {
-        i++;
-      } else {
         clearInterval(interval);
         setDone(true);
       }
