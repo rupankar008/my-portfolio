@@ -59,11 +59,16 @@ export default function LiveChatWidget() {
       peer.on("connection", (conn) => {
         connRef.current = conn;
         setStatus("online");
-        setMessages(prev => [...prev, { sender: "DEV", text: "A guest has connected. Say hello!", time: new Date().toLocaleTimeString() }]);
         
+        // AUTO-GREETING FROM DEV TO GUEST
+        setTimeout(() => {
+          const greeting = "Developer has joined the chat. Tell me your issue, how can I help you?";
+          conn.send(greeting);
+          setMessages(prev => [...prev, { sender: "DEV", text: greeting, time: new Date().toLocaleTimeString() }]);
+        }, 1000);
+
         conn.on("data", (data: any) => {
           setMessages(prev => [...prev, { sender: "GUEST", text: data, time: new Date().toLocaleTimeString() }]);
-          // Notification sound
           new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
         });
 
@@ -74,9 +79,9 @@ export default function LiveChatWidget() {
       });
 
       peer.on("error", (err) => {
-        console.error(err);
+        console.error("PEER ERROR:", err.type);
         if (asAdmin && err.type === "unavailable-id") {
-          setMessages(prev => [...prev, { sender: "DEV", text: "Error: Admin is already active in another tab.", time: new Date().toLocaleTimeString() }]);
+          setMessages(prev => [...prev, { sender: "DEV", text: "Error: Admin session active elsewhere.", time: new Date().toLocaleTimeString() }]);
         }
       });
     });
@@ -84,52 +89,63 @@ export default function LiveChatWidget() {
 
   const connectToAdmin = (peer: Peer) => {
     setStatus("connecting");
-    setMessages([{ sender: "DEV", text: "Developer has been notified. Please wait shortly (within 2 min)...", time: new Date().toLocaleTimeString() }]);
+    setMessages([{ sender: "DEV", text: "Developer has been notified. Please wait (within 2 min)...", time: new Date().toLocaleTimeString() }]);
 
-    // FIRE EMAIL IMMEDIATELY
-    const currentOrigin = typeof window !== "undefined" ? window.location.origin : "https://rupankar008.vercel.app";
-
+    // FIRE EMAIL
+    const currentOrigin = typeof window !== "undefined" ? window.location.origin : "";
     fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         access_key: "1a1c6c0a-f12d-45a9-a5af-acb176949647",
-        subject: "🚀 LIVE SUPPORT: Guest is Waiting!",
-        name: "Portfolio Support System",
-        email: "support@rupankar.me",
-        message: `A guest just opened the professional Live Support widget and is waiting for you. 
-
-JOIN NOW: ${currentOrigin}/?admin=true`
+        subject: "🚀 URGENT: Guest waiting for Chat!",
+        name: "Support System",
+        message: `Join now: ${currentOrigin}/?admin=true`
       })
     }).catch(console.error);
 
-    const conn = peer.connect("rupankar-admin-terminal-v1");
-    connRef.current = conn;
-
+    let retryInterval: any;
     let connected = false;
 
-    conn.on("open", () => {
-      connected = true;
-      setStatus("online");
-      setMessages(prev => [...prev, { sender: "DEV", text: "Developer has joined the chat.", time: new Date().toLocaleTimeString() }]);
-    });
+    const attemptConnection = () => {
+      if (connected) return;
+      const conn = peer.connect("rupankar-admin-terminal-v1");
+      connRef.current = conn;
 
-    conn.on("data", (data: any) => {
-      setMessages(prev => [...prev, { sender: "DEV", text: data, time: new Date().toLocaleTimeString() }]);
-      // Notification sound for guest
-      new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
-    });
+      conn.on("open", () => {
+        connected = true;
+        clearInterval(retryInterval);
+        setStatus("online");
+        setMessages(prev => [...prev, { sender: "DEV", text: "Connected! Developer is here.", time: new Date().toLocaleTimeString() }]);
+      });
 
-    conn.on("close", () => {
-      setStatus("offline");
-      setMessages(prev => [...prev, { sender: "DEV", text: "Developer went offline.", time: new Date().toLocaleTimeString() }]);
-    });
+      conn.on("data", (data: any) => {
+        setMessages(prev => [...prev, { sender: "DEV", text: data, time: new Date().toLocaleTimeString() }]);
+        new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
+      });
+
+      conn.on("close", () => {
+        setStatus("offline");
+        setMessages(prev => [...prev, { sender: "DEV", text: "Developer disconnected.", time: new Date().toLocaleTimeString() }]);
+      });
+    };
+
+    // Initial attempt
+    attemptConnection();
+
+    // RETRY EVERY 5 SECONDS
+    retryInterval = setInterval(() => {
+      if (!connected) {
+        attemptConnection();
+      }
+    }, 5000);
 
     // 2 MINUTE TIMEOUT
     setTimeout(() => {
+      clearInterval(retryInterval);
       if (!connected) {
         setStatus("offline");
-        setMessages(prev => [...prev, { sender: "DEV", text: "Developer is unavailable to join at the moment. Please try again after some time or reach out via the Contact page.", time: new Date().toLocaleTimeString() }]);
+        setMessages(prev => [...prev, { sender: "DEV", text: "Developer is unavailable right now. Please try again later or use the Contact page.", time: new Date().toLocaleTimeString() }]);
       }
     }, 120000);
   };
