@@ -7,7 +7,7 @@ import { Html } from "@react-three/drei";
 
 function RealisticGlobe() {
   const meshRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
+  const atmosphereRef = useRef<THREE.Mesh>(null);
   
   // Load textures
   const textureLoader = new THREE.TextureLoader();
@@ -15,12 +15,23 @@ function RealisticGlobe() {
   const specularMap = useMemo(() => textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg"), []);
   const normalMap = useMemo(() => textureLoader.load("https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg"), []);
 
+  // Convert Lat/Long to 3D Cartesian coordinates
+  // Burdwan: 23.23 N, 87.86 E
+  const lat = 23.2324;
+  const lon = 87.8615;
+  const radius = 2.2;
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 90) * (Math.PI / 180);
+
+  const markerPos: [number, number, number] = [
+    radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta)
+  ];
+
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0015;
-    }
-    if (glowRef.current) {
-      glowRef.current.rotation.y += 0.0015;
+      meshRef.current.rotation.y += 0.001;
     }
   });
 
@@ -28,7 +39,7 @@ function RealisticGlobe() {
     <group>
       {/* The Actual Earth */}
       <mesh ref={meshRef}>
-        <sphereGeometry args={[2.2, 64, 64]} />
+        <sphereGeometry args={[radius, 64, 64]} />
         <meshPhongMaterial 
           map={earthTexture}
           specularMap={specularMap}
@@ -37,30 +48,31 @@ function RealisticGlobe() {
           shininess={5}
         />
         
-        {/* Marker for India (Burdwan) */}
-        <mesh position={[1.5, 0.9, 1.3]}>
-          <sphereGeometry args={[0.06, 16, 16]} />
-          <meshBasicMaterial color="#ec4899" />
-          <Html position={[0, 0.2, 0]} center>
-            <div className="flex flex-col items-center pointer-events-none">
-              <div className="w-2 h-2 rounded-full bg-pink-500 animate-ping absolute" />
-              <div className="w-2 h-2 rounded-full bg-pink-500 relative z-10 shadow-[0_0_10px_#ec4899]" />
-              <div className="mt-2 px-2 py-1 bg-black/80 border border-pink-500/50 rounded text-[9px] text-pink-400 font-mono whitespace-nowrap backdrop-blur-md">
-                BURDWAN, IN
-              </div>
-            </div>
-          </Html>
-        </mesh>
+        {/* Exact Marker for Burdwan, IN */}
+        <group position={markerPos}>
+           <mesh>
+             <sphereGeometry args={[0.04, 16, 16]} />
+             <meshBasicMaterial color="#ec4899" />
+           </mesh>
+           <Html position={[0, 0.15, 0]} center>
+             <div className="flex flex-col items-center pointer-events-none">
+               <div className="w-3 h-3 rounded-full bg-pink-500 animate-ping absolute" />
+               <div className="mt-2 px-2 py-1 bg-black/90 border border-pink-500/50 rounded text-[8px] text-pink-400 font-bold font-mono whitespace-nowrap backdrop-blur-md shadow-2xl">
+                 BURDWAN
+               </div>
+             </div>
+           </Html>
+        </group>
       </mesh>
 
-      {/* Atmospheric Glow */}
-      <mesh ref={glowRef}>
-        <sphereGeometry args={[2.25, 64, 64]} />
+      {/* Atmospheric Glow (No Grids) */}
+      <mesh>
+        <sphereGeometry args={[radius * 1.02, 64, 64]} />
         <meshBasicMaterial 
           color="#60a5fa" 
           transparent 
-          opacity={0.15} 
-          wireframe
+          opacity={0.1} 
+          side={THREE.BackSide}
         />
       </mesh>
     </group>
