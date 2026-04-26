@@ -93,10 +93,10 @@ export default function AIAgent() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-8 z-[90] flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-blue-500/30 px-4 py-2.5 rounded-full text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:border-blue-400 hover:text-blue-300 transition-all cursor-pointer"
+        className="fixed bottom-20 md:bottom-24 right-6 md:right-8 z-[90] flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-blue-500/30 p-2.5 md:px-4 md:py-2.5 rounded-full text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:border-blue-400 transition-all"
       >
-        <Bot size={20} className="animate-pulse" />
-        <span className="text-xs font-bold uppercase tracking-widest">Query JARVIS</span>
+        <Bot size={18} className="md:w-5 md:h-5 animate-pulse" />
+        <span className="hidden md:block text-[10px] font-bold uppercase tracking-widest">Query JARVIS</span>
       </motion.button>
 
       <AnimatePresence>

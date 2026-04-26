@@ -245,9 +245,9 @@ export default function LiveChatWidget() {
           setIsOpen(!isOpen);
           // Don't auto-initialize anymore
         }}
-        className="fixed bottom-8 right-8 z-[100] w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer"
+        className="fixed bottom-6 md:bottom-8 right-6 md:right-8 z-[100] w-11 h-11 md:w-14 md:h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer transition-all"
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        {isOpen ? <X size={20} className="md:w-6 md:h-6" /> : <MessageSquare size={20} className="md:w-6 md:h-6" />}
         {status === "online" && !isOpen && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-pulse" />
         )}

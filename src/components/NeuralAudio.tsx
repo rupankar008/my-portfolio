@@ -37,6 +37,17 @@ export default function NeuralAudio() {
         },
       });
     };
+
+    const handleAutoStart = () => {
+      if (playerRef.current) {
+        playerRef.current.playVideo();
+        setIsPlaying(true);
+        setHasInteracted(true);
+      }
+    };
+
+    window.addEventListener("neural_audio_start", handleAutoStart);
+    return () => window.removeEventListener("neural_audio_start", handleAutoStart);
   }, []);
 
   const togglePlayback = () => {
@@ -46,20 +57,20 @@ export default function NeuralAudio() {
       playerRef.current.pauseVideo();
     } else {
       playerRef.current.playVideo();
-      if (!hasInteracted) setHasInteracted(true);
+      setHasInteracted(true);
     }
     setIsPlaying(!isPlaying);
   };
 
   return (
-    <div className="fixed bottom-8 left-8 z-[100]">
+    <div className="fixed bottom-6 md:bottom-8 left-6 md:left-8 z-[100]">
       <div id="youtube-player" className="hidden" />
       
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={togglePlayback}
-        className={`relative flex items-center justify-center w-12 h-12 rounded-full border backdrop-blur-xl transition-all duration-500 ${
+        className={`relative flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border backdrop-blur-xl transition-all duration-500 ${
           isPlaying 
             ? "bg-blue-500/20 border-blue-400 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.4)]" 
             : "bg-black/40 border-white/10 text-white/40 hover:border-white/30"
@@ -107,18 +118,6 @@ export default function NeuralAudio() {
           </div>
         )}
       </motion.button>
-
-      {/* Instructional Tooltip */}
-      {!hasInteracted && (
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="absolute left-16 top-1/2 -translate-y-1/2 whitespace-nowrap bg-blue-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-xl pointer-events-none"
-        >
-          Neural Sync Available
-          <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-8 border-transparent border-r-blue-500" />
-        </motion.div>
-      )}
     </div>
   );
 }

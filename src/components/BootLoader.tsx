@@ -28,19 +28,22 @@ export default function BootLoader({ onComplete }: { onComplete: () => void }) {
         setLines((prev) => [...prev, bootLines[i]]);
         i++;
       } else {
+        i++;
+      } else {
         clearInterval(interval);
-        setTimeout(() => {
-          setDone(true);
-          setTimeout(() => {
-            setVisible(false);
-            onComplete();
-          }, 600);
-        }, 500);
+        setDone(true);
       }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, []);
+
+  const handleEnter = () => {
+    // Trigger a global custom event so NeuralAudio knows to start
+    window.dispatchEvent(new Event("neural_audio_start"));
+    setVisible(false);
+    setTimeout(onComplete, 600);
+  };
 
   return (
     <AnimatePresence>
@@ -75,6 +78,19 @@ export default function BootLoader({ onComplete }: { onComplete: () => void }) {
                 {line}
               </motion.div>
             ))}
+            {done && (
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59,130,246,0.3)" }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleEnter}
+                className="mt-8 px-6 py-2.5 bg-blue-600/20 border border-blue-500/50 text-blue-400 rounded-lg text-xs font-bold uppercase tracking-[0.2em] hover:bg-blue-600/30 transition-all flex items-center gap-3"
+              >
+                Enter System
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              </motion.button>
+            )}
             {!done && (
               <motion.span
                 animate={{ opacity: [1, 0] }}
