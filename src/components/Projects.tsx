@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Code, Layout, Smartphone, Globe } from "lucide-react";
 import MagneticButton from "./MagneticButton";
-
 import DecryptedText from "./DecryptedText";
+import Web3Tip from "./Web3Tip";
 
 const projects = [
   {
@@ -107,7 +107,10 @@ export default function Projects() {
               <a href="https://github.com/rupankar008" target="_blank" className="text-2xl font-bold text-white/50 hover:text-purple-400 transition-colors">GitHub</a>
               <a href="https://discord.com" target="_blank" className="text-2xl font-bold text-white/50 hover:text-pink-400 transition-colors">Discord</a>
            </div>
-           <p className="mt-20 text-white/20 text-sm tracking-widest">
+           
+           <Web3Tip />
+           
+           <p className="mt-8 text-white/20 text-sm tracking-widest">
              <DecryptedText text="© 2026 RUPANKAR BHUIYA. ALL RIGHTS RESERVED." delay={500} />
            </p>
         </motion.div>

@@ -4,6 +4,7 @@ import { useScroll } from "framer-motion";
 import { useState, useCallback } from "react";
 import ScrollyCanvas from "@/components/ScrollyCanvas";
 import Overlay from "@/components/Overlay";
+import SkillGraph from "@/components/SkillGraph";
 import Projects from "@/components/Projects";
 import StatsCounter from "@/components/StatsCounter";
 import BootLoader from "@/components/BootLoader";
@@ -29,6 +30,7 @@ export default function Home() {
 
       <div className="relative z-10 bg-[#050505]">
         <StatsCounter />
+        <SkillGraph />
         <Projects />
       </div>
     </main>

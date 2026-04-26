@@ -73,4 +73,32 @@ html {
   .animate-spin-slow {
     animation: spin-slow 12s linear infinite;
   }
+
+  /* Meltdown Protocol */
+  @keyframes meltdown-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); filter: hue-rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); filter: hue-rotate(90deg) saturate(3); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); filter: hue-rotate(180deg) saturate(5); }
+    30% { transform: translate(3px, 2px) rotate(0deg); filter: hue-rotate(270deg) saturate(3); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); filter: hue-rotate(0deg) saturate(5); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); filter: hue-rotate(90deg) saturate(3); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); filter: hue-rotate(0deg); }
+  }
+
+  body.meltdown {
+    animation: meltdown-shake 0.5s infinite;
+    background-color: #300 !important;
+    color: #ff3333 !important;
+  }
+  body.meltdown canvas {
+    filter: hue-rotate(130deg) saturate(3) contrast(1.5) !important;
+  }
+  body.meltdown * {
+    text-shadow: 0 0 5px red !important;
+    border-color: red !important;
+  }
 }

@@ -101,6 +101,18 @@ export default function Terminal() {
       setHistory([{ type: "output", text: "Terminal cleared." }]);
     } else if (cmd === "exit") {
       setOpen(false);
+    } else if (cmd === "sudo hack") {
+      document.body.classList.toggle("meltdown");
+      newHistory.push({ type: "output", text: "MELTDOWN PROTOCOL INITIATED..." });
+      newHistory.push({ type: "output", text: "ACCESS GRANTED." });
+      setHistory(newHistory);
+      
+      // Also play an alarm sound if audio system is active
+      if (typeof window !== "undefined") {
+        import('@/lib/AudioSystem').then(({ audioSystem }) => {
+          audioSystem.playHover(); // as a fallback beep
+        });
+      }
     } else {
       const res = responses[cmd] ?? [`Command not found: "${cmd}". Type "help".`];
       res.forEach((line) => newHistory.push({ type: "output", text: line }));
