@@ -26,24 +26,23 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
   useEffect(() => {
     const images: HTMLImageElement[] = [];
-    let essentialLoaded = 0;
-    const essentialIndices = [0, 24, 48, 72, 96, 119]; 
-
-    for (let i = 0; i < FRAME_COUNT; i++) {
-      const img = new Image();
-      img.src = getFrameUrl(i);
-      img.onload = () => {
-        if (essentialIndices.includes(i)) {
-          essentialLoaded++;
-          if (essentialLoaded === essentialIndices.length) {
-            setReady(true);
-            drawImage(0);
-          }
-        }
-      };
-      images[i] = img;
-    }
     imagesRef.current = images;
+
+    // Load the first frame immediately to unblock the UI
+    const firstImg = new Image();
+    firstImg.src = getFrameUrl(0);
+    firstImg.onload = () => {
+      images[0] = firstImg;
+      setReady(true);
+      drawImage(0);
+
+      // Once the first frame is loaded, request the rest
+      for (let i = 1; i < FRAME_COUNT; i++) {
+        const img = new Image();
+        img.src = getFrameUrl(i);
+        images[i] = img;
+      }
+    };
   }, []);
 
   const drawImage = (index: number) => {
