@@ -78,15 +78,15 @@ export default function BootLoader({ onComplete }: { onComplete: () => void }) {
             ))}
             {done && (
               <motion.button
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59,130,246,0.3)" }}
-                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(59,130,246,0.6)" }}
+                whileTap={{ scale: 0.9 }}
                 onClick={handleEnter}
-                className="mt-8 px-6 py-2.5 bg-blue-600/20 border border-blue-500/50 text-blue-400 rounded-lg text-xs font-bold uppercase tracking-[0.2em] hover:bg-blue-600/30 transition-all flex items-center gap-3"
+                className="mt-12 px-10 py-4 bg-blue-600 border border-blue-400 text-white rounded-full text-sm font-bold uppercase tracking-[0.3em] hover:bg-blue-500 transition-all flex items-center gap-4 group shadow-[0_0_20px_rgba(59,130,246,0.4)]"
               >
                 Enter System
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-white animate-ping group-hover:bg-blue-200" />
               </motion.button>
             )}
             {!done && (
