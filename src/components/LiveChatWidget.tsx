@@ -84,6 +84,23 @@ export default function LiveChatWidget() {
 
   const connectToAdmin = (peer: Peer) => {
     setStatus("connecting");
+    setMessages([{ sender: "DEV", text: "Developer has been notified. Please wait shortly (within 2 min)...", time: new Date().toLocaleTimeString() }]);
+
+    // FIRE EMAIL IMMEDIATELY
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_key: "1a1c6c0a-f12d-45a9-a5af-acb176949647",
+        subject: "🚀 LIVE SUPPORT: Guest is Waiting!",
+        name: "Portfolio Support System",
+        email: "support@rupankar.me",
+        message: `A guest just opened the professional Live Support widget and is waiting for you. 
+
+JOIN NOW: https://rupankar008.vercel.app/?admin=true`
+      })
+    }).catch(console.error);
+
     const conn = peer.connect("rupankar-admin-terminal-v1");
     connRef.current = conn;
 
@@ -92,26 +109,13 @@ export default function LiveChatWidget() {
     conn.on("open", () => {
       connected = true;
       setStatus("online");
-      setMessages([{ sender: "DEV", text: "Developer has joined the chat.", time: new Date().toLocaleTimeString() }]);
-      
-      // Email Notification to Dev
-      fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_key: "1a1c6c0a-f12d-45a9-a5af-acb176949647",
-          subject: "🚀 LIVE SUPPORT: Guest is Waiting!",
-          name: "Portfolio Support",
-          email: "support@rupankar.me",
-          message: `A guest just opened the professional Live Support widget. 
-
-JOIN NOW: https://rupankar008.vercel.app/?admin=true`
-        })
-      }).catch(console.error);
+      setMessages(prev => [...prev, { sender: "DEV", text: "Developer has joined the chat.", time: new Date().toLocaleTimeString() }]);
     });
 
     conn.on("data", (data: any) => {
       setMessages(prev => [...prev, { sender: "DEV", text: data, time: new Date().toLocaleTimeString() }]);
+      // Notification sound for guest
+      new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
     });
 
     conn.on("close", () => {
@@ -119,12 +123,13 @@ JOIN NOW: https://rupankar008.vercel.app/?admin=true`
       setMessages(prev => [...prev, { sender: "DEV", text: "Developer went offline.", time: new Date().toLocaleTimeString() }]);
     });
 
+    // 2 MINUTE TIMEOUT
     setTimeout(() => {
       if (!connected) {
         setStatus("offline");
-        setMessages([{ sender: "DEV", text: "Developer is currently offline. Please leave your email in the Contact page!", time: new Date().toLocaleTimeString() }]);
+        setMessages(prev => [...prev, { sender: "DEV", text: "Developer is unavailable to join at the moment. Please try again after some time or reach out via the Contact page.", time: new Date().toLocaleTimeString() }]);
       }
-    }, 5000);
+    }, 120000);
   };
 
   const sendMessage = () => {
