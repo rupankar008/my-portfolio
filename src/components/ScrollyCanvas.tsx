@@ -114,6 +114,14 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
   useMotionValueEvent(progress, "change", (latest) => {
     const frameIndex = Math.floor(latest * (FRAME_COUNT - 1));
     drawImage(Math.min(frameIndex, FRAME_COUNT - 1));
+    
+    // Add audio system pitch update based on scroll velocity
+    if (typeof window !== "undefined" && window.innerWidth > 768) {
+      import('@/lib/AudioSystem').then(({ audioSystem }) => {
+        // Calculate a rough velocity based on the change in progress (latest - previous would be better, but latest works as a proxy for frequency mapping if needed)
+        audioSystem.updateAmbientPitch(latest * 10);
+      });
+    }
   });
 
   return (

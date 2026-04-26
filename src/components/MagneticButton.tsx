@@ -2,6 +2,7 @@
 
 import { useRef, useState, ReactNode } from "react";
 import { motion } from "framer-motion";
+import { audioSystem } from "@/lib/AudioSystem";
 
 export default function MagneticButton({ children, className }: { children: ReactNode, className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,6 +28,8 @@ export default function MagneticButton({ children, className }: { children: Reac
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => audioSystem.playHover()}
+      onClick={() => audioSystem.playClick()}
       animate={{ x, y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
       className={className}

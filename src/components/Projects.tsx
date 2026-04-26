@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { ExternalLink, Code, Layout, Smartphone, Globe } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 
+import DecryptedText from "./DecryptedText";
+
 const projects = [
   {
     title: "AI Nexus",
@@ -45,8 +47,15 @@ export default function Projects() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <h2 className="text-sm uppercase tracking-[0.5em] text-white/40 font-bold mb-4">Selected Work</h2>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter italic uppercase">Crafted with <br/> <span className="text-blue-500">Precision.</span></h2>
+          <h2 className="text-sm uppercase tracking-[0.5em] text-white/40 font-bold mb-4">
+            <DecryptedText text="Selected Work" />
+          </h2>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter italic uppercase">
+            <DecryptedText text="Crafted with" sequential={false} /> <br/> 
+            <span className="text-blue-500">
+              <DecryptedText text="Precision." delay={300} />
+            </span>
+          </h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
@@ -90,13 +99,17 @@ export default function Projects() {
           whileInView={{ opacity: 1 }}
           className="mt-40 pt-20 border-t border-white/10 text-center"
         >
-           <h2 className="text-6xl md:text-9xl font-black tracking-tighter mb-12 opacity-10 uppercase">Let's Connect</h2>
+           <h2 className="text-6xl md:text-9xl font-black tracking-tighter mb-12 opacity-10 uppercase">
+             <DecryptedText text="Let's Connect" speed={30} maxIterations={20} />
+           </h2>
            <div className="flex flex-wrap justify-center gap-12">
               <a href="https://instagram.com/rupankar.void" target="_blank" className="text-2xl font-bold text-white/50 hover:text-blue-400 transition-colors">Instagram</a>
               <a href="https://github.com/rupankar008" target="_blank" className="text-2xl font-bold text-white/50 hover:text-purple-400 transition-colors">GitHub</a>
               <a href="https://discord.com" target="_blank" className="text-2xl font-bold text-white/50 hover:text-pink-400 transition-colors">Discord</a>
            </div>
-           <p className="mt-20 text-white/20 text-sm tracking-widest">© 2026 RUPANKAR BHUIYA. ALL RIGHTS RESERVED.</p>
+           <p className="mt-20 text-white/20 text-sm tracking-widest">
+             <DecryptedText text="© 2026 RUPANKAR BHUIYA. ALL RIGHTS RESERVED." delay={500} />
+           </p>
         </motion.div>
       </div>
     </section>
