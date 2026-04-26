@@ -57,6 +57,48 @@ const responses: Record<string, string[]> = {
   ],
 };
 
+const MatrixRain = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$%#X@!".split("");
+    const fontSize = 10;
+    const columns = canvas.width / fontSize;
+    const drops: number[] = Array(Math.floor(columns)).fill(1);
+
+    const draw = () => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 33);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-20 mix-blend-screen z-0" />;
+};
+
 export default function Terminal() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -137,8 +179,22 @@ export default function Terminal() {
       }
     } else if (cmdLower === "chat") {
       newHistory.push({ type: "output", text: "Connecting to secure P2P channel..." });
+      newHistory.push({ type: "output", text: "Pinging Developer via Email..." });
       setHistory(newHistory);
       setChatMode("connecting");
+
+      // Live Support Web3Forms Email Trigger
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "1a1c6c0a-f12d-45a9-a5af-acb176949647",
+          subject: "🚨 URGENT: Guest wants Live Chat!",
+          name: "Terminal System",
+          email: "noreply@portfolio.com",
+          message: "A guest just typed 'chat' in the terminal. Go to your site and type 'sudo admin' to connect to them right now!"
+        })
+      }).catch(console.error);
 
       import("peerjs").then(({ default: Peer }) => {
         const peer = new Peer();
@@ -240,8 +296,10 @@ export default function Terminal() {
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="fixed bottom-16 left-6 z-[200] w-[90vw] max-w-lg bg-black/95 border border-blue-500/30 rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(59,130,246,0.15)] backdrop-blur-2xl"
           >
+            <MatrixRain />
+            
             {/* Title Bar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
+            <div className="relative z-10 flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500/70" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
@@ -256,9 +314,9 @@ export default function Terminal() {
             </div>
 
             {/* Output */}
-            <div className="p-4 h-64 overflow-y-auto font-mono text-[12px] space-y-1">
+            <div className="relative z-10 p-4 h-64 overflow-y-auto font-mono text-[12px] space-y-1">
               {history.map((line, i) => (
-                <div key={i} className={line.type === "input" ? "text-blue-400" : "text-white/60"}>
+                <div key={i} className={line.type === "input" ? "text-blue-400" : "text-white/80 font-semibold drop-shadow-md"}>
                   {line.text}
                 </div>
               ))}
@@ -266,7 +324,7 @@ export default function Terminal() {
             </div>
 
             {/* Input */}
-            <div className="flex items-center gap-2 px-4 py-3 border-t border-white/5">
+            <div className="relative z-10 flex items-center gap-2 px-4 py-3 border-t border-white/5 bg-black/50">
               <span className="text-blue-400 font-mono text-sm">
                 {chatMode === "idle" ? "$" : ">"}
               </span>

@@ -9,6 +9,9 @@ import Projects from "@/components/Projects";
 import StatsCounter from "@/components/StatsCounter";
 import BootLoader from "@/components/BootLoader";
 
+import GlobeTracker from "@/components/GlobeTracker";
+import LiveCryptoChart from "@/components/LiveCryptoChart";
+
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const [booted, setBooted] = useState(false);
@@ -30,6 +33,13 @@ export default function Home() {
 
       <div className="relative z-10 bg-[#050505]">
         <StatsCounter />
+        
+        {/* Live Dashboards */}
+        <section className="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row gap-8 justify-center">
+          <LiveCryptoChart />
+          <GlobeTracker />
+        </section>
+
         <SkillGraph />
         <Projects />
       </div>

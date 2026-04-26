@@ -1,0 +1,15 @@
+{
+  "name": "rupankar-void",
+  "version": "1.0.0",
+  "description": "CLI Resume for Rupankar Bhuiya",
+  "main": "index.js",
+  "bin": {
+    "rupankar-void": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["resume", "cli", "portfolio"],
+  "author": "Rupankar Bhuiya",
+  "license": "ISC"
+}
