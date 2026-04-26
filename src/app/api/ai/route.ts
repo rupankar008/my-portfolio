@@ -1,7 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 const SYSTEM_PROMPT = `
 You are JARVIS, a highly sophisticated AI agent representing Rupankar Bhuiya (Rupankar008). 
@@ -25,56 +22,56 @@ CURRENT CONTEXT: You are embedded in Rupankar's professional portfolio.
 `;
 
 export async function POST(req: Request) {
-  // Using the absolute latest model strings which are more likely to be found on v1
-  const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest", "gemini-pro"];
-  let lastError = null;
-
-  const { message, history } = await response_json(req);
-
-  for (const modelName of modelsToTry) {
-    try {
-      // Forcing the model to use the most stable configuration
-      const model = genAI.getGenerativeModel({ 
-        model: modelName,
-      });
-
-      const chat = model.startChat({
-        history: [
-          { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-          { role: "model", parts: [{ text: "Neural Link established. I am JARVIS. How may I assist you regarding Rupankar's portfolio?" }] },
-          ...history.map((msg: any) => ({
-            role: msg.role === "assistant" ? "model" : "user",
-            parts: [{ text: msg.content }],
-          })),
-        ],
-      });
-
-      const result = await chat.sendMessage(message);
-      const response = await result.response;
-      const text = response.text();
-
-      return NextResponse.json({ reply: text });
-    } catch (error: any) {
-      console.error(`Error with model ${modelName}:`, error);
-      lastError = error;
-      // If it's a 404, it's a model-not-found error, so we try the next one.
-      if (error?.message?.includes("404") || error?.message?.includes("not found")) {
-        continue;
-      }
-      break;
-    }
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ reply: "Sir, the GEMINI_API_KEY is missing from the environment variables." }, { status: 500 });
   }
 
-  const errorMessage = lastError?.message || "Neural recalibration required.";
-  return NextResponse.json({ 
-    reply: `[SYSTEM OVERRIDE]: ${errorMessage}. \n\nSir, it appears your API Key might not have 'Generative Language API' enabled in Google AI Studio, or it is restricted. Please check your key settings.` 
-  }, { status: 500 });
-}
-
-async function response_json(req: Request) {
   try {
-    return await req.json();
-  } catch {
-    return { message: "", history: [] };
+    const { message, history } = await req.json();
+
+    // Direct REST API call to v1 (Production)
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const formattedHistory = history.map((msg: any) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const body = {
+      contents: [
+        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+        { role: "model", parts: [{ text: "Neural Link established. I am JARVIS. How may I assist you regarding Rupankar's portfolio?" }] },
+        ...formattedHistory,
+        { role: "user", parts: [{ text: message }] }
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1024,
+      }
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || `HTTP Error ${response.status}`);
+    }
+
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sir, my neural response was empty. Please try again.";
+    return NextResponse.json({ reply });
+
+  } catch (error: any) {
+    console.error("Gemini Direct Error:", error);
+    return NextResponse.json({ 
+      reply: `[NEURAL LINK FAILURE]: ${error.message}. \n\nSir, please ensure your API Key is valid and 'Generative Language API' is enabled in your Google AI Studio settings.` 
+    }, { status: 500 });
   }
 }
