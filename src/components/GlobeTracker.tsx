@@ -20,11 +20,13 @@ function RealisticGlobe() {
   const lat = 23.2324;
   const lon = 87.8615;
   const radius = 2.2;
+  
+  // Recalibrated formula for standard Three.js texture mapping
   const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 90) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
 
   const markerPos: [number, number, number] = [
-    radius * Math.sin(phi) * Math.cos(theta),
+    -radius * Math.sin(phi) * Math.cos(theta),
     radius * Math.cos(phi),
     radius * Math.sin(phi) * Math.sin(theta)
   ];
