@@ -25,33 +25,48 @@ CURRENT CONTEXT: You are embedded in Rupankar's professional portfolio.
 `;
 
 export async function POST(req: Request) {
-  try {
-    const { message, history } = await response_json(req);
-    const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
+  const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+  let lastError = null;
 
-    const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-        { role: "model", parts: [{ text: "Neural Link established. I am JARVIS. How may I assist you regarding Rupankar's portfolio?" }] },
-        ...history.map((msg: any) => ({
-          role: msg.role === "assistant" ? "model" : "user",
-          parts: [{ text: msg.content }],
-        })),
-      ],
-    });
+  const { message, history } = await response_json(req);
 
-    const result = await chat.sendMessage(message);
-    const response = await result.response;
-    const text = response.text();
+  for (const modelName of modelsToTry) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const chat = model.startChat({
+        history: [
+          { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+          { role: "model", parts: [{ text: "Neural Link established. I am JARVIS. How may I assist you regarding Rupankar's portfolio?" }] },
+          ...history.map((msg: any) => ({
+            role: msg.role === "assistant" ? "model" : "user",
+            parts: [{ text: msg.content }],
+          })),
+        ],
+      });
 
-    return NextResponse.json({ reply: text });
-  } catch (error: any) {
-    console.error("Gemini Error:", error);
-    const errorMessage = error?.message || "Neural recalibration required.";
-    return NextResponse.json({ reply: `[DIAGNOSTIC ERROR]: ${errorMessage}. Please ensure GEMINI_API_KEY is correct in Vercel.` }, { status: 500 });
+      const result = await chat.sendMessage(message);
+      const response = await result.response;
+      const text = response.text();
+
+      return NextResponse.json({ reply: text });
+    } catch (error: any) {
+      console.error(`Error with model ${modelName}:`, error);
+      lastError = error;
+      // If it's a 404, continue to next model. Otherwise, break and show error.
+      if (!error?.message?.includes("404")) {
+        break;
+      }
+    }
   }
+
+  const errorMessage = lastError?.message || "Neural recalibration required.";
+  return NextResponse.json({ reply: `[CRITICAL ERROR]: ${errorMessage}. Tried all models (${modelsToTry.join(", ")}).` }, { status: 500 });
 }
 
 async function response_json(req: Request) {
-  return await req.json();
+  try {
+    return await req.json();
+  } catch {
+    return { message: "", history: [] };
+  }
 }
