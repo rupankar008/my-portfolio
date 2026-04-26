@@ -39,6 +39,9 @@ export const metadata: Metadata = {
     description: "Creative Developer & Interactive Designer",
     creator: "@rupankar008",
   },
+  verification: {
+    google: "mmOUqgDQmqyxq6i37XvtqDs6AYVkt3m7Ao5QXL2-CWg",
+  },
 };
 
 export default function RootLayout({
