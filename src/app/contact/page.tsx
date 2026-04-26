@@ -22,7 +22,7 @@ export default function ContactPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          access_key: "1a1c6c0a-f12d-45a9-a5af-acb176949647",
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "YOUR_WEB3FORMS_ACCESS_KEY_HERE",
           name: form.name,
           email: form.email,
           subject: form.subject || "Portfolio Contact",
