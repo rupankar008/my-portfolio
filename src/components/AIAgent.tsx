@@ -101,6 +101,10 @@ export default function AIAgent() {
 
       <AnimatePresence>
         {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
             className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col md:flex-row h-screen overflow-hidden overscroll-none"
           >
             {/* Sidebar / Info - Hidden on Mobile Chat */}
