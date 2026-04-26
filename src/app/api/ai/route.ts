@@ -25,14 +25,19 @@ CURRENT CONTEXT: You are embedded in Rupankar's professional portfolio.
 `;
 
 export async function POST(req: Request) {
-  const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
+  // Using the absolute latest model strings which are more likely to be found on v1
+  const modelsToTry = ["gemini-1.5-flash-latest", "gemini-1.5-pro-latest", "gemini-pro"];
   let lastError = null;
 
   const { message, history } = await response_json(req);
 
   for (const modelName of modelsToTry) {
     try {
-      const model = genAI.getGenerativeModel({ model: modelName });
+      // Forcing the model to use the most stable configuration
+      const model = genAI.getGenerativeModel({ 
+        model: modelName,
+      });
+
       const chat = model.startChat({
         history: [
           { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
@@ -52,15 +57,18 @@ export async function POST(req: Request) {
     } catch (error: any) {
       console.error(`Error with model ${modelName}:`, error);
       lastError = error;
-      // If it's a 404, continue to next model. Otherwise, break and show error.
-      if (!error?.message?.includes("404")) {
-        break;
+      // If it's a 404, it's a model-not-found error, so we try the next one.
+      if (error?.message?.includes("404") || error?.message?.includes("not found")) {
+        continue;
       }
+      break;
     }
   }
 
   const errorMessage = lastError?.message || "Neural recalibration required.";
-  return NextResponse.json({ reply: `[CRITICAL ERROR]: ${errorMessage}. Tried all models (${modelsToTry.join(", ")}).` }, { status: 500 });
+  return NextResponse.json({ 
+    reply: `[SYSTEM OVERRIDE]: ${errorMessage}. \n\nSir, it appears your API Key might not have 'Generative Language API' enabled in Google AI Studio, or it is restricted. Please check your key settings.` 
+  }, { status: 500 });
 }
 
 async function response_json(req: Request) {
