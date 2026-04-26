@@ -137,8 +137,9 @@ export default function Terminal() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history]);
 
-  const handleCommand = useCallback(() => {
-    const cmd = input.trim();
+  const handleCommand = useCallback((forceCmd?: string | React.MouseEvent | React.KeyboardEvent) => {
+    const rawCmd = typeof forceCmd === 'string' ? forceCmd : input;
+    const cmd = rawCmd.trim();
     if (!cmd) return;
 
     if (cmd.toLowerCase() === "exit") {
@@ -286,6 +287,26 @@ export default function Terminal() {
         <span className="hidden md:inline">[type "void" to access terminal]</span>
         <span className="md:hidden">[tap to access terminal]</span>
       </button>
+
+      {/* Live Support Floating Button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => {
+          setOpen(true);
+          if (chatMode === "idle") {
+            // Give it a tiny delay so the terminal opens first
+            setTimeout(() => handleCommand("chat"), 100);
+          }
+        }}
+        className="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-blue-500 text-white rounded-full px-5 py-3 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center gap-2 font-mono text-xs font-bold tracking-widest transition-colors cursor-pointer outline-none"
+      >
+        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+        <span className="hidden sm:inline">LIVE SUPPORT</span>
+        <span className="sm:hidden">CHAT</span>
+      </motion.button>
 
       <AnimatePresence>
         {open && (
