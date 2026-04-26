@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, User, ShieldCheck, Clock } from "lucide-react";
+import { MessageSquare, X, Send, User, ShieldCheck, Clock, Image as ImageIcon } from "lucide-react";
 import type Peer from "peerjs";
 
 interface Message {
   sender: "GUEST" | "DEV";
-  text: string;
+  text?: string;
+  image?: string;
   time: string;
 }
 
@@ -21,6 +22,8 @@ export default function LiveChatWidget() {
   const peerRef = useRef<Peer | null>(null);
   const connRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastActivityRef = useRef<number>(Date.now());
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -29,6 +32,34 @@ export default function LiveChatWidget() {
     }
   }, [messages, isOpen]);
 
+  // Cleanup peer on unmount
+  useEffect(() => {
+    return () => {
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
+    };
+  }, []);
+
+  // Inactivity Watchdog (5 minutes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (status === "online" && !isAdmin) {
+        const inactiveTime = Date.now() - lastActivityRef.current;
+        if (inactiveTime > 5 * 60 * 1000) {
+          const warning = "Chat closed due to 5 minutes of inactivity. Please refresh to start a new session.";
+          setMessages(prev => [...prev, { sender: "DEV", text: warning, time: new Date().toLocaleTimeString() }]);
+          if (connRef.current) {
+            connRef.current.send({ type: "text", content: "Chat closed due to guest inactivity." });
+            connRef.current.close();
+          }
+          setStatus("offline");
+        }
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [status, isAdmin]);
+
   // Check for Admin URL parameter
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -36,6 +67,7 @@ export default function LiveChatWidget() {
       if (params.get("admin") === "true") {
         setIsAdmin(true);
         setIsOpen(true);
+        if (peerRef.current) peerRef.current.destroy();
         initializePeer(true);
       }
     }
@@ -47,12 +79,11 @@ export default function LiveChatWidget() {
       const peer = peerId ? new Peer(peerId) : new Peer();
       peerRef.current = peer;
 
-      peer.on("open", (id) => {
-        if (!asAdmin) {
-          connectToAdmin(peer);
-        } else {
+      peer.on("open", () => {
+        if (!asAdmin) connectToAdmin(peer);
+        else {
           setStatus("online");
-          setMessages(prev => [...prev, { sender: "DEV", text: "Admin Mode Active. Waiting for guests...", time: new Date().toLocaleTimeString() }]);
+          setMessages([{ sender: "DEV", text: "Admin Mode Active. Waiting for guests...", time: new Date().toLocaleTimeString() }]);
         }
       });
 
@@ -60,15 +91,19 @@ export default function LiveChatWidget() {
         connRef.current = conn;
         setStatus("online");
         
-        // AUTO-GREETING FROM DEV TO GUEST
         setTimeout(() => {
           const greeting = "Developer has joined the chat. Tell me your issue, how can I help you?";
-          conn.send(greeting);
+          conn.send({ type: "text", content: greeting });
           setMessages(prev => [...prev, { sender: "DEV", text: greeting, time: new Date().toLocaleTimeString() }]);
         }, 1000);
 
         conn.on("data", (data: any) => {
-          setMessages(prev => [...prev, { sender: "GUEST", text: data, time: new Date().toLocaleTimeString() }]);
+          lastActivityRef.current = Date.now();
+          if (data.type === "image") {
+            setMessages(prev => [...prev, { sender: "GUEST", image: data.content, time: new Date().toLocaleTimeString() }]);
+          } else {
+            setMessages(prev => [...prev, { sender: "GUEST", text: data.content, time: new Date().toLocaleTimeString() }]);
+          }
           new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
         });
 
@@ -79,9 +114,8 @@ export default function LiveChatWidget() {
       });
 
       peer.on("error", (err) => {
-        console.error("PEER ERROR:", err.type);
         if (asAdmin && err.type === "unavailable-id") {
-          setMessages(prev => [...prev, { sender: "DEV", text: "Error: Admin session active elsewhere.", time: new Date().toLocaleTimeString() }]);
+          setMessages(prev => [...prev, { sender: "DEV", text: "ERROR: Admin session active elsewhere.", time: new Date().toLocaleTimeString() }]);
         }
       });
     });
@@ -91,7 +125,6 @@ export default function LiveChatWidget() {
     setStatus("connecting");
     setMessages([{ sender: "DEV", text: "Developer has been notified. Please wait (within 2 min)...", time: new Date().toLocaleTimeString() }]);
 
-    // FIRE EMAIL
     const currentOrigin = typeof window !== "undefined" ? window.location.origin : "";
     fetch("https://api.web3forms.com/submit", {
       method: "POST",
@@ -120,55 +153,57 @@ export default function LiveChatWidget() {
       });
 
       conn.on("data", (data: any) => {
-        setMessages(prev => [...prev, { sender: "DEV", text: data, time: new Date().toLocaleTimeString() }]);
+        lastActivityRef.current = Date.now();
+        if (data.type === "image") {
+          setMessages(prev => [...prev, { sender: "DEV", image: data.content, time: new Date().toLocaleTimeString() }]);
+        } else {
+          setMessages(prev => [...prev, { sender: "DEV", text: data.content, time: new Date().toLocaleTimeString() }]);
+        }
         new Audio("https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3").play().catch(() => {});
-      });
-
-      conn.on("close", () => {
-        setStatus("offline");
-        setMessages(prev => [...prev, { sender: "DEV", text: "Developer disconnected.", time: new Date().toLocaleTimeString() }]);
       });
     };
 
-    // Initial attempt
     attemptConnection();
-
-    // RETRY EVERY 5 SECONDS
-    retryInterval = setInterval(() => {
-      if (!connected) {
-        attemptConnection();
-      }
-    }, 5000);
-
-    // 2 MINUTE TIMEOUT
+    retryInterval = setInterval(() => { if (!connected) attemptConnection(); }, 5000);
     setTimeout(() => {
       clearInterval(retryInterval);
       if (!connected) {
         setStatus("offline");
-        setMessages(prev => [...prev, { sender: "DEV", text: "Developer is unavailable right now. Please try again later or use the Contact page.", time: new Date().toLocaleTimeString() }]);
+        setMessages(prev => [...prev, { sender: "DEV", text: "Developer is unavailable right now.", time: new Date().toLocaleTimeString() }]);
       }
     }, 120000);
   };
 
   const sendMessage = () => {
     if (!inputText.trim() || !connRef.current) return;
-    
-    connRef.current.send(inputText);
+    lastActivityRef.current = Date.now();
+    connRef.current.send({ type: "text", content: inputText });
     setMessages(prev => [...prev, { sender: isAdmin ? "DEV" : "GUEST", text: inputText, time: new Date().toLocaleTimeString() }]);
     setInputText("");
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !connRef.current) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      lastActivityRef.current = Date.now();
+      connRef.current.send({ type: "image", content: base64 });
+      setMessages(prev => [...prev, { sender: isAdmin ? "DEV" : "GUEST", image: base64, time: new Date().toLocaleTimeString() }]);
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <>
-      {/* Floating Bubble */}
       <motion.button
         whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)" }}
         whileTap={{ scale: 0.9 }}
         onClick={() => {
           setIsOpen(!isOpen);
-          if (!isOpen && !isAdmin && status === "offline") {
-            initializePeer(false);
-          }
+          if (!isOpen && !isAdmin && status === "offline") initializePeer(false);
         }}
         className="fixed bottom-8 right-8 z-[100] w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer"
       >
@@ -186,69 +221,54 @@ export default function LiveChatWidget() {
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
             className="fixed bottom-28 right-8 z-[100] w-[90vw] max-w-[380px] h-[500px] bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           >
-            {/* Header */}
             <div className="p-4 bg-blue-600/20 border-b border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
                   {isAdmin ? <ShieldCheck size={20} className="text-blue-400" /> : <User size={20} className="text-blue-400" />}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-wide">
-                    {isAdmin ? "Admin Console" : "Live Support"}
-                  </h3>
+                  <h3 className="text-sm font-bold text-white tracking-wide">{isAdmin ? "Admin Console" : "Live Support"}</h3>
                   <div className="flex items-center gap-1.5">
                     <span className={`w-1.5 h-1.5 rounded-full ${status === "online" ? "bg-green-500" : status === "connecting" ? "bg-yellow-500" : "bg-red-500"}`} />
-                    <span className="text-[10px] text-white/50 uppercase font-mono">
-                      {status === "online" ? "Online" : status === "connecting" ? "Connecting..." : "Offline"}
-                    </span>
+                    <span className="text-[10px] text-white/50 uppercase font-mono">{status === "online" ? "Online" : status === "connecting" ? "Connecting..." : "Offline"}</span>
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white transition-colors">
-                <X size={18} />
-              </button>
+              <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white transition-colors"><X size={18} /></button>
             </div>
 
-            {/* Messages Area */}
             <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-gradient-to-b from-transparent to-blue-900/5">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex flex-col ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "items-end" : "items-start"}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                    msg.sender === (isAdmin ? "DEV" : "GUEST") 
-                      ? "bg-blue-600 text-white rounded-tr-none" 
-                      : "bg-white/10 text-white/90 border border-white/5 rounded-tl-none"
-                  }`}>
-                    {msg.text}
+                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "bg-blue-600 text-white rounded-tr-none" : "bg-white/10 text-white/90 border border-white/5 rounded-tl-none"}`}>
+                    {msg.image ? (
+                      <img src={msg.image} alt="shared" className="rounded-lg max-w-full h-auto cursor-pointer" onClick={() => window.open(msg.image)} />
+                    ) : (
+                      msg.text
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 mt-1 text-[9px] text-white/30 font-mono">
-                    <Clock size={10} />
-                    {msg.time}
-                  </div>
+                  <div className="flex items-center gap-1 mt-1 text-[9px] text-white/30 font-mono"><Clock size={10} />{msg.time}</div>
                 </div>
               ))}
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-black/40 border-t border-white/5 flex items-center gap-2">
-              <input
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Type your message..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500/50 transition-colors placeholder-white/20"
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!inputText.trim()}
-                className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-500 transition-colors"
-              >
-                <Send size={18} />
-              </button>
-            </div>
-            
-            {/* Attribution */}
-            <div className="py-2 text-center bg-black/60">
-              <p className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-mono">Secure P2P Channel Active</p>
+            <div className="p-4 bg-black/40 border-t border-white/5 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                <button onClick={() => fileInputRef.current?.click()} className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-white/50 hover:text-white transition-all">
+                  <ImageIcon size={18} />
+                </button>
+                <input
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  placeholder="Type your message..."
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-blue-500/50 transition-colors"
+                />
+                <button onClick={sendMessage} disabled={!inputText.trim()} className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white disabled:opacity-50 hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                  <Send size={18} />
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
