@@ -19,6 +19,7 @@ export default function LiveChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  const [needsConsent, setNeedsConsent] = useState(true);
   
   const peerRef = useRef<Peer | null>(null);
   const connRef = useRef<any>(null);
@@ -242,7 +243,7 @@ export default function LiveChatWidget() {
         whileTap={{ scale: 0.9 }}
         onClick={() => {
           setIsOpen(!isOpen);
-          if (!isOpen && !isAdmin && status === "offline") initializePeer(false);
+          // Don't auto-initialize anymore
         }}
         className="fixed bottom-8 right-8 z-[100] w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-2xl cursor-pointer"
       >
@@ -276,7 +277,7 @@ export default function LiveChatWidget() {
             initial={{ opacity: 0, y: 100, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            className="fixed bottom-28 right-8 z-[100] w-[90vw] max-w-[380px] h-[500px] bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            className="fixed bottom-28 right-8 z-[100] w-[90vw] max-w-[380px] h-[60dvh] md:h-[500px] bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           >
             <div className="p-4 bg-blue-600/20 border-b border-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -306,18 +307,47 @@ export default function LiveChatWidget() {
             </div>
 
             <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4 scroll-smooth bg-gradient-to-b from-transparent to-blue-900/5">
-              {messages.map((msg, i) => (
-                <div key={i} className={`flex flex-col ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "items-end" : "items-start"}`}>
-                  <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "bg-blue-600 text-white rounded-tr-none" : "bg-white/10 text-white/90 border border-white/5 rounded-tl-none"}`}>
-                    {msg.image ? (
-                      <img src={msg.image} alt="shared" className="rounded-lg max-w-full h-auto cursor-zoom-in" onClick={() => setExpandedImage(msg.image!)} />
-                    ) : (
-                      msg.text
-                    )}
+              {needsConsent && !isAdmin && status === "offline" ? (
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-6 p-4">
+                  <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <MessageSquare className="text-blue-400" />
                   </div>
-                  <div className="flex items-center gap-1 mt-1 text-[9px] text-white/30 font-mono"><Clock size={10} />{msg.time}</div>
+                  <div>
+                    <h4 className="text-white font-bold mb-1">Establish Live Link?</h4>
+                    <p className="text-xs text-white/40">Connect directly with Rupankar for technical support or inquiries.</p>
+                  </div>
+                  <div className="flex gap-3 w-full">
+                    <button 
+                      onClick={() => {
+                        setNeedsConsent(false);
+                        initializePeer(false);
+                      }}
+                      className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all"
+                    >
+                      Yes, Connect
+                    </button>
+                    <button 
+                      onClick={() => setIsOpen(false)}
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white/60 rounded-xl text-xs font-bold transition-all border border-white/5"
+                    >
+                      Maybe Later
+                    </button>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                messages.map((msg, i) => (
+                  <div key={i} className={`flex flex-col ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "items-end" : "items-start"}`}>
+                    <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.sender === (isAdmin ? "DEV" : "GUEST") ? "bg-blue-600 text-white rounded-tr-none" : "bg-white/10 text-white/90 border border-white/5 rounded-tl-none"}`}>
+                      {msg.image ? (
+                        <img src={msg.image} alt="shared" className="rounded-lg max-w-full h-auto cursor-zoom-in" onClick={() => setExpandedImage(msg.image!)} />
+                      ) : (
+                        msg.text
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-1 text-[9px] text-white/30 font-mono"><Clock size={10} />{msg.time}</div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="p-4 bg-black/40 border-t border-white/5 flex flex-col gap-2">

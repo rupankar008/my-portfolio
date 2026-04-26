@@ -213,24 +213,24 @@ export default function AIAgent() {
               )}
 
               {/* Input */}
-              <div className="p-6 md:p-12 border-t border-white/5 bg-black/40">
-                 <div className="relative max-w-4xl mx-auto flex items-center gap-4">
+              <div className="shrink-0 p-4 md:p-12 border-t border-white/5 bg-black/60 backdrop-blur-xl">
+                 <div className="relative max-w-4xl mx-auto flex items-center gap-2 md:gap-4">
                     <input
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSend(inputText)}
                       placeholder="Input neural query..."
-                      className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-blue-500/50 transition-all placeholder:text-white/10"
+                      className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base text-white outline-none focus:border-blue-500/50 transition-all placeholder:text-white/10"
                     />
                     <button 
                       onClick={() => handleSend(inputText)}
-                      className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white hover:bg-blue-500 transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                      className="w-12 h-12 md:w-14 md:h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white hover:bg-blue-500 transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)]"
                     >
-                      <Send size={20} />
+                      <Send size={18} />
                     </button>
                  </div>
-                 <div className="mt-4 text-center">
-                    <p className="text-[8px] text-white/10 uppercase tracking-[0.3em]">Neural Interface active | Gemini Core v1.5</p>
+                 <div className="mt-2 md:mt-4 text-center">
+                    <p className="text-[7px] md:text-[8px] text-white/10 uppercase tracking-[0.3em]">Neural Interface active | Gemini Core v1.5</p>
                  </div>
               </div>
             </div>
