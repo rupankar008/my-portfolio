@@ -223,9 +223,13 @@ export default function Terminal() {
 
   return (
     <>
-      <div className="fixed bottom-6 left-6 z-40 text-[9px] font-mono text-white/10 hover:text-white/30 transition-colors cursor-default select-none">
-        [type "void" to access terminal]
-      </div>
+      <button 
+        onClick={() => setOpen(true)}
+        className="fixed bottom-6 left-6 z-40 text-[9px] font-mono text-white/10 hover:text-white/30 transition-colors cursor-pointer select-none outline-none"
+      >
+        <span className="hidden md:inline">[type "void" to access terminal]</span>
+        <span className="md:hidden">[tap to access terminal]</span>
+      </button>
 
       <AnimatePresence>
         {open && (
