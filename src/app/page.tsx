@@ -12,6 +12,7 @@ import BootLoader from "@/components/BootLoader";
 import GlobeTracker from "@/components/GlobeTracker";
 import LiveCryptoChart from "@/components/LiveCryptoChart";
 import LiveChatWidget from "@/components/LiveChatWidget";
+import AIAgent from "@/components/AIAgent";
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
@@ -46,6 +47,7 @@ export default function Home() {
       </div>
 
       <LiveChatWidget />
+      <AIAgent />
     </main>
   );
 }
