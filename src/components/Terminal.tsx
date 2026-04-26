@@ -129,6 +129,18 @@ export default function Terminal() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
+  // AUTO-ADMIN DETECTOR: If URL has ?admin=true, auto-trigger sudo admin
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("admin") === "true") {
+        setOpen(true);
+        // Delay to allow component to mount fully
+        setTimeout(() => handleCommand("sudo admin"), 500);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
@@ -193,7 +205,12 @@ export default function Terminal() {
           subject: "🚨 URGENT: Guest wants Live Chat!",
           name: "Terminal System",
           email: "noreply@portfolio.com",
-          message: "A guest just typed 'chat' in the terminal. Go to your site and type 'sudo admin' to connect to them right now!"
+          message: `A guest just initiated a Live Chat session. 
+
+CLICK HERE TO JOIN IMMEDIATELY:
+https://rupankar008.vercel.app/?admin=true
+
+(This link will automatically log you in as Admin and open the secure channel)`
         })
       }).catch(console.error);
 
