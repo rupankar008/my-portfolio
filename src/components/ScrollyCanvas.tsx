@@ -24,7 +24,7 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
   const indicatorOpacity = useTransform(progress, [0, 0.05], [1, 0]);
 
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const images: HTMLImageElement[] = [];
