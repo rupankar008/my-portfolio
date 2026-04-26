@@ -45,9 +45,10 @@ export async function POST(req: Request) {
     const text = response.text();
 
     return NextResponse.json({ reply: text });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Error:", error);
-    return NextResponse.json({ reply: "I apologize, but my neural processors are currently recalibrating. Please try again or use the Live Support feature." }, { status: 500 });
+    const errorMessage = error?.message || "Neural recalibration required.";
+    return NextResponse.json({ reply: `[DIAGNOSTIC ERROR]: ${errorMessage}. Please ensure GEMINI_API_KEY is correct in Vercel.` }, { status: 500 });
   }
 }
 
