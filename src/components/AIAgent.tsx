@@ -21,7 +21,7 @@ export default function AIAgent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  // Persistence: Load messages on mount (Session Only)
+  const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const saved = sessionStorage.getItem("jarvis_chat_history");
     if (saved) {
