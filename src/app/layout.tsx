@@ -13,15 +13,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Rupankar Bhuiya | Creative Developer & Interactive Designer",
-  description: "Official portfolio of Rupankar Bhuiya. Specialized in building high-performance, interactive digital experiences using Next.js, Framer Motion, and WebGL.",
+  title: "Rupankar Space | Official Portfolio of Rupankar Bhuiya",
+  description: "Explore Rupankar Space - the interactive portfolio of Rupankar Bhuiya. A Creative Developer, Cryptographer, and Stock Market Expert specializing in high-end digital experiences.",
+  keywords: ["Rupankar Space", "Rupankar Bhuiya", "Creative Developer", "Next.js Portfolio", "Burdwan Developer", "Trading Portfolio", "Interactive Web Design"],
+  authors: [{ name: "Rupankar Bhuiya" }],
   openGraph: {
-    title: "Rupankar Bhuiya | Creative Developer",
-    description: "Building the future of interactive web experiences.",
-    url: "https://my-portfolio-snowy-one-6769afbvgc.vercel.app/",
-    siteName: "Rupankar Bhuiya Portfolio",
+    title: "Rupankar Space | Digital Frontier",
+    description: "Building the next generation of interactive web experiences.",
+    url: "https://rupankar.space",
+    siteName: "Rupankar Space",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rupankar Space Preview",
+      },
+    ],
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rupankar Space",
+    description: "Creative Developer & Interactive Designer",
+    creator: "@rupankar008",
   },
 };
 
