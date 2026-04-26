@@ -27,7 +27,7 @@ CURRENT CONTEXT: You are embedded in Rupankar's professional portfolio.
 export async function POST(req: Request) {
   try {
     const { message, history } = await response_json(req);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const chat = model.startChat({
       history: [
