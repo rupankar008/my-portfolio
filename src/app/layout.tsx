@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import SmoothScroll from "@/components/SmoothScroll";
 import Ticker from "@/components/Ticker";
 import Terminal from "@/components/Terminal";
+import NeuralAudio from "@/components/NeuralAudio";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -61,6 +62,7 @@ export default function RootLayout({
         </SmoothScroll>
         {/* Terminal Easter Egg — global, outside SmoothScroll */}
         <Terminal />
+        <NeuralAudio />
       </body>
     </html>
   );
