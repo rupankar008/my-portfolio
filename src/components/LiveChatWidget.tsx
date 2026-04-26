@@ -87,6 +87,8 @@ export default function LiveChatWidget() {
     setMessages([{ sender: "DEV", text: "Developer has been notified. Please wait shortly (within 2 min)...", time: new Date().toLocaleTimeString() }]);
 
     // FIRE EMAIL IMMEDIATELY
+    const currentOrigin = typeof window !== "undefined" ? window.location.origin : "https://rupankar008.vercel.app";
+
     fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -97,7 +99,7 @@ export default function LiveChatWidget() {
         email: "support@rupankar.me",
         message: `A guest just opened the professional Live Support widget and is waiting for you. 
 
-JOIN NOW: https://rupankar008.vercel.app/?admin=true`
+JOIN NOW: ${currentOrigin}/?admin=true`
       })
     }).catch(console.error);
 
