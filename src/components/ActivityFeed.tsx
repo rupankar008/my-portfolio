@@ -26,25 +26,24 @@ export default function ActivityFeed() {
       setSystemStatus(statuses[Math.floor(Math.random() * statuses.length)]);
     }, 5000);
 
-    // 2. Lanyard Spotify Fetching
+    // 2. Local Spotify API Fetching
     const fetchPresence = async () => {
       try {
-        const res = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_ID}`);
+        const res = await fetch(`/api/spotify`);
         const data = await res.json();
         
-        if (data.success && data.data.spotify) {
-          const s = data.data.spotify;
+        if (data.isPlaying) {
           setSpotify({
             isPlaying: true,
-            song: s.track,
-            artist: s.artist,
-            albumArt: s.album_art_url
+            song: data.title,
+            artist: data.artist,
+            albumArt: data.albumImageUrl
           });
         } else {
           setSpotify(null); // Not listening
         }
       } catch (e) {
-        console.error("Lanyard Error:", e);
+        console.error("Spotify API Error:", e);
       }
     };
 
