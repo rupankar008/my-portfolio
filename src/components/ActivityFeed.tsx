@@ -19,6 +19,8 @@ export default function ActivityFeed() {
   const [spotify, setSpotify] = useState<SpotifyData | null>(null);
   const [systemStatus, setSystemStatus] = useState("Initializing...");
 
+  const [apiStatus, setApiStatus] = useState<string>("Offline");
+
   useEffect(() => {
     // 1. System Status Rotation
     const statuses = ["Compiling Node...", "Analyzing Market Data", "Pushing to Main", "Neural Link Active", "Optimizing UI"];
@@ -32,6 +34,8 @@ export default function ActivityFeed() {
         const res = await fetch(`/api/spotify`);
         const data = await res.json();
         
+        setApiStatus(data.status || (res.ok ? "Synced" : `Error ${res.status}`));
+
         if (data.isPlaying) {
           setSpotify({
             isPlaying: true,
@@ -42,7 +46,8 @@ export default function ActivityFeed() {
         } else {
           setSpotify(null); // Not listening
         }
-      } catch (e) {
+      } catch (e: any) {
+        setApiStatus("API Call Failed");
         console.error("Spotify API Error:", e);
       }
     };
@@ -116,7 +121,7 @@ export default function ActivityFeed() {
               </div>
               <div>
                 <p className="text-[8px] uppercase tracking-widest text-white/20 font-bold">Spotify Status</p>
-                <p className="text-[10px] text-white/60 font-mono italic">Developer Busy: Building the Void</p>
+                <p className="text-[10px] text-white/60 font-mono italic">Dev Status: {apiStatus}</p>
               </div>
             </motion.div>
           )}
