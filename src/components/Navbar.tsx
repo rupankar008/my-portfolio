@@ -3,20 +3,9 @@
 import { motion } from "framer-motion";
 import { InstagramIcon } from "@/components/Icons";
 import Link from "next/link";
-
 import { useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
-import { audioSystem } from "@/lib/AudioSystem";
 
 export default function Navbar() {
-  const [isMuted, setIsMuted] = useState(true);
-
-  const toggleAudio = () => {
-    const newMuted = !isMuted;
-    setIsMuted(newMuted);
-    audioSystem.toggleMute(newMuted);
-  };
-
   return (
     <motion.nav 
       initial={{ y: -100, opacity: 0 }}
@@ -49,20 +38,14 @@ export default function Navbar() {
         
         <div className="flex items-center gap-3 md:gap-8 bg-black/20 backdrop-blur-md px-4 md:px-8 py-3 rounded-full border border-white/10 shadow-2xl pointer-events-auto">
           <Link href="/about" 
-                onMouseEnter={() => audioSystem.playHover()} 
-                onClick={() => audioSystem.playClick()}
                 className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             About
           </Link>
           <Link href="/#projects" 
-                onMouseEnter={() => audioSystem.playHover()} 
-                onClick={() => audioSystem.playClick()}
                 className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             Projects
           </Link>
           <Link href="/contact" 
-                onMouseEnter={() => audioSystem.playHover()} 
-                onClick={() => audioSystem.playClick()}
                 className="text-[10px] md:text-sm font-medium text-white/70 hover:text-white transition-colors uppercase tracking-widest">
             Contact
           </Link>
@@ -70,16 +53,6 @@ export default function Navbar() {
         
         <div className="flex items-center gap-4">
           <button 
-            onClick={toggleAudio}
-            className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-white/5 hover:bg-white/20 transition-all shadow-[0_0_10px_rgba(255,255,255,0.05)]"
-            title={isMuted ? "Unmute Audio" : "Mute Audio"}
-          >
-            {isMuted ? <VolumeX size={16} className="text-white/50" /> : <Volume2 size={16} className="text-white" />}
-          </button>
-
-          <button 
-            onMouseEnter={() => audioSystem.playHover()} 
-            onClick={() => audioSystem.playClick()}
             className="group relative flex items-center gap-2 bg-blue-600/10 border border-blue-500/30 text-blue-400 px-5 py-2.5 rounded-full text-sm font-bold hover:bg-blue-600 hover:text-white hover:border-transparent transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:scale-105 active:scale-95"
           >
             <div className="absolute inset-0 rounded-full bg-blue-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -99,8 +72,6 @@ export default function Navbar() {
             href="https://instagram.com/rupankar.void" 
             target="_blank" 
             rel="noreferrer"
-            onMouseEnter={() => audioSystem.playHover()} 
-            onClick={() => audioSystem.playClick()}
             className="flex items-center gap-2 bg-white/10 border border-white/20 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:border-transparent transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95"
           >
             <InstagramIcon size={18} />

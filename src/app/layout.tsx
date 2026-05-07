@@ -62,7 +62,6 @@ export default function RootLayout({
         </SmoothScroll>
         {/* Terminal Easter Egg — global, outside SmoothScroll */}
         <Terminal />
-        <NeuralAudio />
       </body>
     </html>
   );

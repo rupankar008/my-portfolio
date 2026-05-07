@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Lock, Send, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import DecryptedText from "./DecryptedText";
-import { audioSystem } from "@/lib/AudioSystem";
 
 export default function SecureMessage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +14,6 @@ export default function SecureMessage() {
   const handleSend = () => {
     if (!message.trim()) return;
     setIsSending(true);
-    audioSystem.playSecure();
     setTimeout(() => {
       setIsSending(false);
       setIsSuccess(true);

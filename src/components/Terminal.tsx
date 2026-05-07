@@ -152,10 +152,6 @@ export default function Terminal() {
       newHistory.push({ type: "output", text: "MELTDOWN PROTOCOL INITIATED..." });
       newHistory.push({ type: "output", text: "ACCESS GRANTED." });
       setHistory(newHistory);
-      
-      if (typeof window !== "undefined") {
-        import('@/lib/AudioSystem').then(({ audioSystem }) => audioSystem.playHover());
-      }
     } else {
       const res = responses[cmdLower] ?? [`Command not found: "${cmdLower}". Type "help".`];
       res.forEach((line) => newHistory.push({ type: "output", text: line }));
