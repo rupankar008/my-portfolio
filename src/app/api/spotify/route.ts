@@ -7,14 +7,23 @@ export async function GET() {
   try {
     const response = await getNowPlaying();
 
-    if (response.status === 204 || response.status > 400) {
-      return NextResponse.json({ isPlaying: false });
+    // Debug logging for the developer (you can see this in Vercel Logs)
+    console.log("Spotify API Status:", response.status);
+
+    if (response.status === 204) {
+      return NextResponse.json({ isPlaying: false, status: "No song playing" });
+    }
+
+    if (response.status > 400) {
+      const errorText = await response.text();
+      console.error("Spotify API Error Response:", errorText);
+      return NextResponse.json({ isPlaying: false, error: "Spotify API rejection", status: response.status });
     }
 
     const song = await response.json();
 
-    if (song.item === null) {
-      return NextResponse.json({ isPlaying: false });
+    if (!song || song.item === null) {
+      return NextResponse.json({ isPlaying: false, status: "Song item null" });
     }
 
     const isPlaying = song.is_playing;
@@ -32,7 +41,8 @@ export async function GET() {
       songUrl,
       title,
     });
-  } catch (error) {
-    return NextResponse.json({ isPlaying: false, error: "Failed to fetch Spotify data" });
+  } catch (error: any) {
+    console.error("Internal Server Error:", error.message);
+    return NextResponse.json({ isPlaying: false, error: error.message });
   }
 }
