@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Music, Clock, Zap } from "lucide-react";
+import { Music, Clock, Zap } from "lucide-react";
+import { GithubIcon } from "@/components/Icons";
 import { useState, useEffect } from "react";
 
 export default function ActivityFeed() {
@@ -44,7 +45,7 @@ export default function ActivityFeed() {
 
         <div className="flex items-center gap-3 bg-black/40 backdrop-blur-xl border border-white/5 p-3 rounded-2xl group hover:border-purple-500/30 transition-all">
           <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-            <Github size={14} className="text-purple-400" />
+            <GithubIcon size={14} className="text-purple-400" />
           </div>
           <div>
             <p className="text-[8px] uppercase tracking-widest text-white/30 font-bold">Last Commit</p>
