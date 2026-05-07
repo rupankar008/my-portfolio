@@ -121,7 +121,7 @@ export default function ActivityFeed() {
               </div>
               <div>
                 <p className="text-[8px] uppercase tracking-widest text-white/20 font-bold">Spotify Status</p>
-                <p className="text-[10px] text-white/60 font-mono italic">Dev Status: {apiStatus}</p>
+                <p className="text-[10px] text-white/60 font-mono italic">Developer Busy: Building the Void</p>
               </div>
             </motion.div>
           )}
