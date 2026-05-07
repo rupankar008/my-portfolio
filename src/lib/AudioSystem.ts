@@ -109,6 +109,36 @@ class AudioSystem {
     
     this.ambientOscillator.frequency.setTargetAtTime(targetFreq, this.context.currentTime, 0.1);
   }
+
+  playSecure() {
+    if (this.isMuted || !this.context) return;
+    const osc = this.context.createOscillator();
+    const gain = this.context.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(400, this.context.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, this.context.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.05, this.context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.context.currentTime + 0.2);
+    osc.connect(gain);
+    gain.connect(this.context.destination);
+    osc.start();
+    osc.stop(this.context.currentTime + 0.2);
+  }
+
+  playScan() {
+    if (this.isMuted || !this.context) return;
+    const osc = this.context.createOscillator();
+    const gain = this.context.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(200, this.context.currentTime);
+    osc.frequency.linearRampToValueAtTime(1000, this.context.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.02, this.context.currentTime);
+    gain.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.05);
+    osc.connect(gain);
+    gain.connect(this.context.destination);
+    osc.start();
+    osc.stop(this.context.currentTime + 0.05);
+  }
 }
 
 export const audioSystem = new AudioSystem();

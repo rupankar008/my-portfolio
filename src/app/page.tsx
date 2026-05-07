@@ -13,6 +13,8 @@ import GlobeTracker from "@/components/GlobeTracker";
 import LiveCryptoChart from "@/components/LiveCryptoChart";
 import LiveChatWidget from "@/components/LiveChatWidget";
 import AIAgent from "@/components/AIAgent";
+import ActivityFeed from "@/components/ActivityFeed";
+import SecureMessage from "@/components/SecureMessage";
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
@@ -46,6 +48,8 @@ export default function Home() {
         <Projects />
       </div>
 
+      <ActivityFeed />
+      <SecureMessage />
       <LiveChatWidget />
       <AIAgent />
     </main>

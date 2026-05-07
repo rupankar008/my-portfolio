@@ -77,6 +77,24 @@ export default function Navbar() {
             {isMuted ? <VolumeX size={16} className="text-white/50" /> : <Volume2 size={16} className="text-white" />}
           </button>
 
+          <button 
+            onMouseEnter={() => audioSystem.playHover()} 
+            onClick={() => audioSystem.playClick()}
+            className="group relative flex items-center gap-2 bg-blue-600/10 border border-blue-500/30 text-blue-400 px-5 py-2.5 rounded-full text-sm font-bold hover:bg-blue-600 hover:text-white hover:border-transparent transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:scale-105 active:scale-95"
+          >
+            <div className="absolute inset-0 rounded-full bg-blue-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            <motion.div
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="relative z-10"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+                <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
+              </svg>
+            </motion.div>
+            <span className="hidden sm:inline relative z-10">Neural Link</span>
+          </button>
+
           <a 
             href="https://instagram.com/rupankar.void" 
             target="_blank" 

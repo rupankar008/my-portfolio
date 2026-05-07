@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ExternalLink, Code, Layout, Smartphone, Globe } from "lucide-react";
 import MagneticButton from "./MagneticButton";
 import DecryptedText from "./DecryptedText";
 import Web3Tip from "./Web3Tip";
+import { useState, useRef } from "react";
 
 const projects = [
   {
@@ -37,6 +38,85 @@ const projects = [
   }
 ];
 
+function ProjectCard({ project, index }: { project: typeof projects[0], index: number }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className={`group relative p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-xl overflow-hidden flex flex-col justify-between hover:border-white/30 transition-all duration-200 ${project.className}`}
+    >
+      {/* Holographic Glitch Overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-purple-500/10" />
+        <div className="glitch-scanline absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]" />
+      </div>
+
+      <div 
+        style={{ transform: "translateZ(50px)" }}
+        className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-110 group-hover:opacity-60 transition-all"
+      >
+        {project.icon}
+      </div>
+      
+      <div style={{ transform: "translateZ(30px)" }}>
+        <h3 className="text-3xl font-bold mb-4 group-hover:text-blue-400 transition-colors">{project.title}</h3>
+        <p className="text-white/50 font-light max-w-xs">{project.description}</p>
+      </div>
+
+      <div 
+        style={{ transform: "translateZ(20px)" }}
+        className="flex items-center justify-between mt-8"
+      >
+        <div className="flex gap-2">
+          {project.tech.map((t) => (
+            <span key={t} className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60">
+              {t}
+            </span>
+          ))}
+        </div>
+        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors">
+          <ExternalLink size={18} />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function Projects() {
   return (
     <section id="projects" className="py-32 px-6 md:px-20 relative z-10">
@@ -58,38 +138,9 @@ export default function Projects() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px] [perspective:1000px]">
           {projects.map((project, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`group relative p-8 rounded-[2.5rem] border border-white/10 backdrop-blur-xl overflow-hidden flex flex-col justify-between hover:border-white/30 transition-all ${project.className}`}
-            >
-              <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:scale-110 transition-transform">
-                {project.icon}
-              </div>
-              
-              <div>
-                <h3 className="text-3xl font-bold mb-4">{project.title}</h3>
-                <p className="text-white/50 font-light max-w-xs">{project.description}</p>
-              </div>
-
-              <div className="flex items-center justify-between mt-8">
-                <div className="flex gap-2">
-                  {project.tech.map((t) => (
-                    <span key={t} className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors">
-                  <ExternalLink size={18} />
-                </div>
-              </div>
-            </motion.div>
+            <ProjectCard key={index} project={project} index={index} />
           ))}
         </div>
 
@@ -118,3 +169,4 @@ export default function Projects() {
     </section>
   );
 }
+

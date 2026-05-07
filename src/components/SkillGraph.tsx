@@ -107,6 +107,18 @@ export default function SkillGraph() {
         <h2 className="text-[10px] uppercase tracking-[0.5em] text-blue-400 font-bold mb-4">Neural Architecture</h2>
         <h2 className="text-4xl md:text-5xl font-black tracking-tighter italic text-white/20 uppercase">Skill Matrix</h2>
       </div>
+
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-5">
+         <div className="w-[80%] h-[1px] bg-blue-500 animate-[glitch-scanline_4s_linear_infinite]" />
+      </div>
+
+      <div className="absolute bottom-10 left-10 z-10 pointer-events-none">
+        <p className="text-[10px] font-mono text-blue-500/50 animate-pulse">
+          &gt; SCANNING NEURAL NETWORK...<br/>
+          &gt; MAPPING SYNAPTIC NODES...<br/>
+          &gt; OPTIMIZING COGNITIVE FLOW...
+        </p>
+      </div>
       
       <div className="w-full h-full cursor-crosshair">
         <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>

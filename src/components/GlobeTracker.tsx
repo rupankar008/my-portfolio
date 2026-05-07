@@ -31,6 +31,25 @@ function RealisticGlobe() {
     radius * Math.sin(phi) * Math.sin(theta)
   ];
 
+  // Neural Nodes (Simulated global access points)
+  const nodes = useMemo(() => [
+    { lat: 40.71, lon: -74.00, label: "NEW YORK" },
+    { lat: 51.50, lon: -0.12, label: "LONDON" },
+    { lat: 35.68, lon: 139.65, label: "TOKYO" },
+    { lat: -33.86, lon: 151.20, label: "SYDNEY" },
+  ].map(n => {
+    const p = (90 - n.lat) * (Math.PI / 180);
+    const t = (n.lon + 180) * (Math.PI / 180);
+    return {
+      pos: [
+        -radius * Math.sin(p) * Math.cos(t),
+        radius * Math.cos(p),
+        radius * Math.sin(p) * Math.sin(t)
+      ] as [number, number, number],
+      label: n.label
+    };
+  }), []);
+
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.001;
@@ -65,6 +84,16 @@ function RealisticGlobe() {
              </div>
            </Html>
         </group>
+
+        {/* Neural Nodes */}
+        {nodes.map((node, i) => (
+          <group key={i} position={node.pos}>
+            <mesh>
+              <sphereGeometry args={[0.02, 8, 8]} />
+              <meshBasicMaterial color="#60a5fa" opacity={0.5} transparent />
+            </mesh>
+          </group>
+        ))}
       </mesh>
 
       {/* Atmospheric Glow (No Grids) */}
