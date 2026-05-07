@@ -65,8 +65,9 @@ export default function ScrollyCanvas({ progress }: ScrollyCanvasProps) {
 
     animationFrameRef.current = requestAnimationFrame(() => {
       const canvas = canvasRef.current;
-      const ctx = canvas?.getContext("2d", { alpha: false });
-      if (!canvas || !ctx) return;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+      if (!ctx) return;
 
       let img = imagesRef.current[index];
       if (!img || !img.complete) {

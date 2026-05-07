@@ -121,7 +121,11 @@ export default function SkillGraph() {
       </div>
       
       <div className="w-full h-full cursor-crosshair">
-        <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
+        <Canvas 
+          camera={{ position: [0, 0, 10], fov: 60 }}
+          dpr={[1, 1.5]}
+          gl={{ antialias: false }}
+        >
           <ambientLight intensity={0.5} />
           <Network />
         </Canvas>

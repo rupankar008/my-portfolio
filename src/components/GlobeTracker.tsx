@@ -147,7 +147,12 @@ export default function GlobeTracker() {
       
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none z-0" />
 
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} className="cursor-crosshair">
+      <Canvas 
+        camera={{ position: [0, 0, 5], fov: 45 }} 
+        dpr={[1, 1.5]} 
+        gl={{ antialias: false }}
+        className="cursor-crosshair"
+      >
         <ambientLight intensity={1} />
         <RealisticGlobe />
       </Canvas>
