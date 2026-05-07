@@ -115,7 +115,7 @@ export default function ActivityFeed() {
                 <Music size={16} className="text-white/20 group-hover:text-blue-400 transition-all" />
               </div>
               <div>
-                <p className="text-[8px] uppercase tracking-widest text-white/20 font-bold">Internal Audio</p>
+                <p className="text-[8px] uppercase tracking-widest text-white/20 font-bold">Spotify Status</p>
                 <p className="text-[10px] text-white/60 font-mono italic">Developer Busy: Building the Void</p>
               </div>
             </motion.div>
